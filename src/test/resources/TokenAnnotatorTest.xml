@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- 
+
+Descriptor for Token Annotator.
+
+-->
+
+
+<analysisEngineDescription xmlns="http://uima.watson.ibm.com/resourceSpecifier">
+	<frameworkImplementation>com.ibm.uima.java</frameworkImplementation>
+	<primitive>true</primitive>
+	<annotatorImplementationName>de.julielab.jules.ae.TokenAnnotator</annotatorImplementationName>
+
+	<analysisEngineMetaData>
+		<name>Token Annotator</name>
+		<description></description>
+		<version>1.1</version>
+		<vendor>julielab</vendor>
+		
+		
+		<configurationParameters>
+			<configurationParameter>
+				<name>ModelFilename</name>
+				<description>Filename for the trained JTBD model</description>
+				<type>String</type>
+				<multiValued>false</multiValued>
+				<mandatory>true</mandatory>
+			</configurationParameter>
+		</configurationParameters>
+		
+		<configurationParameterSettings>
+			<nameValuePair>
+				<name>ModelFilename</name>
+				<value>
+					<string>src/test/resources/TokenAnnotatorTest.mod</string>
+				</value>
+			</nameValuePair>
+		</configurationParameterSettings>
+	
+		
+		<!-- TypeSystem Definition -->
+		<typeSystemDescription>
+			<imports>
+				<import location="JulieTypeSystem.xml"/>
+			</imports>
+		</typeSystemDescription>
+		
+		<!-- Capabilities: Inputs, Outputs, and Preconditions -->
+		<capabilities>
+			<capability>
+				<inputs>
+					<type allAnnotatorFeatures="true">
+						de.julielab.jules.Sentence</type>				
+				</inputs>		
+				<outputs>
+					<type allAnnotatorFeatures="true">
+						de.julielab.jules.Token</type>
+				</outputs>
+			</capability>
+		</capabilities>
+		<operationalProperties>
+			<modifiesCas>true</modifiesCas>
+			<multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+			<outputsNewCASes>false</outputsNewCASes>
+		</operationalProperties>
+	</analysisEngineMetaData>
+</analysisEngineDescription>
