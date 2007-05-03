@@ -7,17 +7,21 @@
  *
  * Author: tomanek
  * 
- * Current version: 0.1 	
- * Since version:   0.1
+ * Current version: 1.2	
+ * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
  * 
  * This is a JUnit test for the TokenAnnotator.
  **/
 
+
 package de.julielab.jules.ae;
 
 import java.util.Iterator;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import com.ibm.uima.UIMAFramework;
 import com.ibm.uima.analysis_engine.AnalysisEngine;
@@ -34,10 +38,23 @@ import junit.framework.TestCase;
 
 public class TokenAnnotatorTest extends TestCase {
 
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger
+			.getLogger(TokenAnnotatorTest.class);
+
+	
 	final private String DESCRIPTOR = "src/test/resources/TokenAnnotatorTest.xml";
 
 	String offsets = "0-4;4-5;6-8;9-12;13-18;18-19;20-22;23-24;25-28;28-29;30-34;34-35;35-42;43-48;49-50;50-53;53-54;54-55" ;
 
+	protected void setUp() throws Exception {
+		super.setUp();
+		// set log4j properties file
+		PropertyConfigurator.configure("src/test/java/log4j.properties");
+	}
+	
 	public void initCas(JCas jcas) {
 		jcas.reset();
 		jcas.setDocumentText("CD44, at any stage, is a XYZ! CD44-related stuff (not).");
@@ -53,7 +70,7 @@ public class TokenAnnotatorTest extends TestCase {
 	}
 	
 	public void testProcess() {
-
+	
 		boolean annotationsOK = true;
 
 		XMLInputSource tokenXML = null;
@@ -67,7 +84,7 @@ public class TokenAnnotatorTest extends TestCase {
 			tokenAnnotator = UIMAFramework
 					.produceAnalysisEngine(tokenSpec);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("testProcess()", e); //$NON-NLS-1$
 		}
 
 
@@ -75,7 +92,7 @@ public class TokenAnnotatorTest extends TestCase {
 			try {
 				jcas = tokenAnnotator.newJCas();
 			} catch (ResourceInitializationException e) {
-				e.printStackTrace();
+				logger.error("testProcess()", e); //$NON-NLS-1$
 			}
 
 			// get test cas with sentence annotation
@@ -96,14 +113,19 @@ public class TokenAnnotatorTest extends TestCase {
 
 			while (tokIter.hasNext()) {
 				Token t = (Token) tokIter.next();
-				System.out.println("OUT: " + t.getCoveredText() + ": " + t.getBegin()
+				if (logger.isDebugEnabled()) {
+					logger.debug("OUT: " + t.getCoveredText() + ": " + t.getBegin()
 						+ " - " + t.getEnd());
+				}
 				predictedOffsets += (predictedOffsets.length() > 0) ? ";" : "";
 				predictedOffsets += t.getBegin() + "-" + t.getEnd();
 			}
 
-			System.out.println("\npredicted: " + predictedOffsets);
-			System.out.println("   wanted: " + offsets);
+			if (logger.isDebugEnabled()) {
+				logger.debug("testProcess() - predicted: " + predictedOffsets);
+				logger.debug("testProcess() -    wanted: " + offsets);
+			}
+
 
 			// compare offsets
 			if (!predictedOffsets.equals(offsets)) {

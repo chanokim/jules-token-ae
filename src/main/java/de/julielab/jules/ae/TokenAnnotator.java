@@ -7,7 +7,7 @@
  *
  * Author: tomanek
  * 
- * Current version: 1.0 	
+ * Current version: 1.2 	
  * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
@@ -24,6 +24,8 @@ package de.julielab.jules.ae;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 import com.ibm.uima.UimaContext;
 import com.ibm.uima.analysis_component.JCasAnnotator_ImplBase;
 import com.ibm.uima.jcas.JFSIndexRepository;
@@ -39,6 +41,12 @@ import de.julielab.jules.types.Token;
 
 public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger
+			.getLogger(TokenAnnotator.class);
+	
 	private Tokenizer tokenizer;
 
 	/**
@@ -49,7 +57,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	public void initialize(UimaContext aContext)
 			throws ResourceInitializationException {
 
-		System.out.println("initializing JTBD...");
+		logger.info("[JTBD] initializing...");
 
 		// invoke default initialization
 		super.initialize(aContext);
@@ -65,17 +73,16 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		try {
 			tokenizer.readModel(modelFilename);
 		} catch (Exception e) {
-			System.err.println("Could not load tokenizer model: "
+			logger.error("[JSBD] Could not load tokenizer model: "
 					+ e.getMessage());
 			throw new ResourceInitializationException();
-			// TODO: how to handle Exceptions in uima correctly?
 		}
-
 	}
 
+	
 	public void process(JCas aJCas) {
 
-		System.out.println(" JTBD: processing next document...");
+		logger.info("[JTBD] processing document...");
 
 		// get all sentences
 		JFSIndexRepository indexes = aJCas.getJFSIndexRepository();
@@ -98,7 +105,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			try {
 				units = tokenizer.predict(sentence.getCoveredText());
 			} catch (JTBDException e) {
-				System.err.println("Error while predicting with JTBD: "
+				logger.error("[JTBD] Error while predicting with JTBD: "
 						+ e.getMessage());
 				throw new RuntimeException();
 			}
@@ -116,14 +123,16 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
 
 	/**
-	 * writes tokens identified to cas by interpreting the Unit objects
+	 * Writes tokens identified to CAS by interpreting the Unit objects. JTBD splits 
+	 * each sentence into several units (see Medinfo paper) and decides for each such
+	 * unit whether it is at the end of a token or not (label "N" means: not at the end).
 	 * 
 	 * @param aJCas
 	 * @param sentOffset
 	 *            begin offset of the current sentence
 	 * @param units
 	 *            Unit objects within this sentence
-	 * @param begin
+	 * @param begin begin offset of the current unit (relative to the current sentence only)
 	 * @return
 	 */
 
@@ -144,6 +153,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				Token annotation = new Token(aJCas);
 				annotation.setBegin(begin);
 				annotation.setEnd(end);
+				annotation.setComponentId("JULIE Token Boundary Detector");
 				annotation.addToIndexes();
 				begin = 0;
 			}
@@ -153,11 +163,11 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	
 	
 	/**
-	 * write last character of a sentence as separate token (if it is a known
-	 * end-of-sentence symbol)
+	 * Write last character of a sentence as separate token (if it is a known
+	 * end-of-sentence symbol).
 	 * 
 	 * @param aJCas
-	 * @param sentence
+	 * @param sentence the current sentence
 	 */
 	private void handleLastCharacter(JCas aJCas, Sentence sentence) {
 

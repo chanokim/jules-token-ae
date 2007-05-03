@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
-<!-- 
-
-Descriptor for Token Annotator.
-
--->
-
-
 <analysisEngineDescription xmlns="http://uima.watson.ibm.com/resourceSpecifier">
 	<frameworkImplementation>com.ibm.uima.java</frameworkImplementation>
 	<primitive>true</primitive>
@@ -15,7 +7,7 @@ Descriptor for Token Annotator.
 	<analysisEngineMetaData>
 		<name>Token Annotator</name>
 		<description></description>
-		<version>1.1</version>
+		<version>1.2</version>
 		<vendor>julielab</vendor>
 		
 		

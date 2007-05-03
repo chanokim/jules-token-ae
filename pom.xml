@@ -8,7 +8,7 @@
   <artifactId>jules-token-ae</artifactId>
   <packaging>jar</packaging>
   <version>1.0</version>
-  <description>Jules Tokenizer</description>
+  <description>UIMA Wrapper for JULIE Token Boundary Detector</description>
 
   <parent>
 	<groupId>de.julielab</groupId>
@@ -26,6 +26,11 @@
       <groupId>de.julielab</groupId>
       <artifactId>jules-types</artifactId>
       <version>1.0</version>	  
-      </dependency>
+    </dependency>
+    <dependency>
+	    <groupId>log4j</groupId>
+	    <artifactId>log4j</artifactId>
+	    <version>1.2.14</version>
+	</dependency>
   </dependencies>
 </project>
