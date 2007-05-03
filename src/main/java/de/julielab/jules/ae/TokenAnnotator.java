@@ -7,7 +7,7 @@
  *
  * Author: tomanek
  * 
- * Current version: 1.2 	
+ * Current version: 1.1 	
  * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
@@ -26,11 +26,11 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
-import com.ibm.uima.UimaContext;
-import com.ibm.uima.analysis_component.JCasAnnotator_ImplBase;
-import com.ibm.uima.jcas.JFSIndexRepository;
-import com.ibm.uima.jcas.impl.JCas;
-import com.ibm.uima.resource.ResourceInitializationException;
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
+import org.apache.uima.jcas.JFSIndexRepository;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
 
 import de.julielab.jtbd.EOSSymbols;
 import de.julielab.jtbd.JTBDException;

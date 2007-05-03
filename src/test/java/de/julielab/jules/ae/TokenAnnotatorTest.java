@@ -7,7 +7,7 @@
  *
  * Author: tomanek
  * 
- * Current version: 1.2	
+ * Current version: 1.1	
  * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
@@ -23,13 +23,13 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.ibm.uima.UIMAFramework;
-import com.ibm.uima.analysis_engine.AnalysisEngine;
-import com.ibm.uima.jcas.JFSIndexRepository;
-import com.ibm.uima.jcas.impl.JCas;
-import com.ibm.uima.resource.ResourceInitializationException;
-import com.ibm.uima.resource.ResourceSpecifier;
-import com.ibm.uima.util.XMLInputSource;
+import org.apache.uima.UIMAFramework;
+import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.jcas.JFSIndexRepository;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.resource.ResourceSpecifier;
+import org.apache.uima.util.XMLInputSource;
 
 import de.julielab.jules.types.Sentence;
 import de.julielab.jules.types.Token;
