@@ -1,7 +1,7 @@
 /** 
  * TokenAnnotatorTest.java
  * 
- * Copyright (c) 2006, JULIE Lab. 
+ * Copyright (c) 2007, JULIE Lab. 
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Common Public License v1.0 
  *
@@ -44,20 +44,22 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	/**
 	 * Logger for this class
 	 */
-	private static final Logger logger = Logger
+	private static final Logger LOGGER = Logger
 			.getLogger(TokenAnnotator.class);
+	
+	private static final String COMPONENT_ID = "JULIE Token Boundary Detector";
 	
 	private Tokenizer tokenizer;
 
 	/**
-	 * initialisiation of JSBD: load the model
+	 * initialisiation of JTBD: load the model
 	 * 
 	 * @parm aContext the parameters in the descriptor
 	 */
 	public void initialize(UimaContext aContext)
 			throws ResourceInitializationException {
 
-		logger.info("[JTBD] initializing...");
+		LOGGER.info("[JTBD] initializing...");
 
 		// invoke default initialization
 		super.initialize(aContext);
@@ -73,7 +75,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		try {
 			tokenizer.readModel(modelFilename);
 		} catch (Exception e) {
-			logger.error("[JSBD] Could not load tokenizer model: "
+			LOGGER.error("[JSBD] Could not load tokenizer model: "
 					+ e.getMessage());
 			throw new ResourceInitializationException();
 		}
@@ -82,7 +84,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	
 	public void process(JCas aJCas) {
 
-		logger.info("[JTBD] processing document...");
+		LOGGER.info("[JTBD] processing document...");
 
 		// get all sentences
 		JFSIndexRepository indexes = aJCas.getJFSIndexRepository();
@@ -105,7 +107,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			try {
 				units = tokenizer.predict(sentence.getCoveredText());
 			} catch (JTBDException e) {
-				logger.error("[JTBD] Error while predicting with JTBD: "
+				LOGGER.error("[JTBD] Error while predicting with JTBD: "
 						+ e.getMessage());
 				throw new RuntimeException();
 			}
@@ -116,9 +118,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
 			// handle last char of sentence:
 			handleLastCharacter(aJCas, sentence);
-
 		} 
-
 	}
 
 
@@ -182,11 +182,10 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				Token annotation = new Token(aJCas);
 				annotation.setBegin(sentence.getEnd() - 1);
 				annotation.setEnd(sentence.getEnd());
+				annotation.setComponentId(COMPONENT_ID);
 				annotation.addToIndexes();
 			}
-
 		}
 	}
-	
 	
 }
