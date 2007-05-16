@@ -44,15 +44,14 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	/**
 	 * Logger for this class
 	 */
-	private static final Logger LOGGER = Logger
-			.getLogger(TokenAnnotator.class);
+	private static final Logger LOGGER = Logger.getLogger(TokenAnnotator.class);
 	
 	private static final String COMPONENT_ID = "JULIE Token Boundary Detector";
 	
 	private Tokenizer tokenizer;
 
 	/**
-	 * initialisiation of JTBD: load the model
+	 * Initialisiation of JTBD: load the model
 	 * 
 	 * @parm aContext the parameters in the descriptor
 	 */
@@ -81,15 +80,14 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		}
 	}
 
-	
+	//TODO add comment
 	public void process(JCas aJCas) {
 
 		LOGGER.info("[JTBD] processing document...");
 
 		// get all sentences
 		JFSIndexRepository indexes = aJCas.getJFSIndexRepository();
-		Iterator sentenceIter = indexes.getAnnotationIndex(Sentence.type)
-				.iterator();
+		Iterator sentenceIter = indexes.getAnnotationIndex(Sentence.type).iterator();
 
 		int sentOffset = 0;
 
@@ -97,6 +95,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			Sentence sentence = (Sentence) sentenceIter.next();
 
 			int len = sentence.getEnd() - sentence.getBegin();
+			//TODO reformat 4 following lines
 			if (len <= 1 || sentence.getCoveredText().equals("")) { // skip
 																	// empty
 																	// sentences
@@ -127,13 +126,10 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 * each sentence into several units (see Medinfo paper) and decides for each such
 	 * unit whether it is at the end of a token or not (label "N" means: not at the end).
 	 * 
-	 * @param aJCas
-	 * @param sentOffset
-	 *            begin offset of the current sentence
-	 * @param units
-	 *            Unit objects within this sentence
-	 * @param begin begin offset of the current unit (relative to the current sentence only)
-	 * @return
+	 * @param aJCas The Cas that is filled.
+	 * @param sentOffset Begin offset of the current sentence.
+	 * @param units Unit objects within this sentence.
+	 * @param begin Begin offset of the current unit (relative to the current sentence only).
 	 */
 
 	private void writeToCAS(JCas aJCas, ArrayList<Unit> units, int sentOffset) {
@@ -166,12 +162,13 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 * Write last character of a sentence as separate token (if it is a known
 	 * end-of-sentence symbol).
 	 * 
-	 * @param aJCas
-	 * @param sentence the current sentence
+	 * @param aJCas The Cas that will contain the token.
+	 * @param sentence The current sentence.
 	 */
 	private void handleLastCharacter(JCas aJCas, Sentence sentence) {
 
 		String sentText = sentence.getCoveredText();
+		//TODO heavy coding convention violation!
 		EOSSymbols E = new EOSSymbols();
 
 		if (sentText.length() > 1) {

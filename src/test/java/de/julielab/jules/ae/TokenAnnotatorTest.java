@@ -35,6 +35,7 @@ import de.julielab.jules.types.Token;
 
 import junit.framework.TestCase;
 
+//TODO sind Descriptoen (TypenSystem) aktuell?
 public class TokenAnnotatorTest extends TestCase {
 
 	/**
@@ -55,6 +56,7 @@ public class TokenAnnotatorTest extends TestCase {
 		PropertyConfigurator.configure("src/test/java/log4j.properties");
 	}
 
+	//TODO add comment
 	public void initCas(JCas jcas) {
 		jcas.reset();
 		jcas.setDocumentText(TEST_TEXT);
@@ -69,6 +71,7 @@ public class TokenAnnotatorTest extends TestCase {
 		s2.addToIndexes();
 	}
 
+	//TODO extract method
 	public void testProcess() {
 
 		boolean annotationsOK = true;
@@ -93,6 +96,7 @@ public class TokenAnnotatorTest extends TestCase {
 			LOGGER.error("testProcess()", e);
 		}
 
+		//TODO is the name of the method justified if you have to add a comment for this line?
 		// get test cas with sentence annotation
 		initCas(jcas);
 
