@@ -129,9 +129,11 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 * @param aJCas The Cas that is filled.
 	 * @param sentOffset Begin offset of the current sentence.
 	 * @param units Unit objects within this sentence.
+	 *
 	 * @param begin Begin offset of the current unit (relative to the current sentence only).
 	 */
-
+	//TODO oben: begin nicht mehr aktuell, oder?
+	
 	private void writeToCAS(JCas aJCas, ArrayList<Unit> units, int sentOffset) {
 
 		int begin = 0;
@@ -142,6 +144,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				begin = unit.begin + sentOffset;
 			}
 			if (units.get(i).label.equals("N")) {
+				//TODO kein statement enthalten -> Bedingung negieren
 				// we are still inside the token (do nothing)
 			} else {
 				// reached end of token
