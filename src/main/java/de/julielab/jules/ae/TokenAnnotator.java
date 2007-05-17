@@ -16,7 +16,7 @@
  * given sentence annotations. Each sentence is seperately split into its single tokens.
  * 
  * 
- * TODO: someday: check wether last symbol is always correctly tokenized!
+ * TODO: double-check whether last symbol is always correctly tokenized!
  **/
 
 package de.julielab.jules.ae;
@@ -80,7 +80,9 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		}
 	}
 
-	//TODO add comment
+	/**
+	 * the process method is in charge of doing the tokenization
+	 */
 	public void process(JCas aJCas) {
 
 		LOGGER.info("[JTBD] processing document...");
@@ -95,10 +97,9 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			Sentence sentence = (Sentence) sentenceIter.next();
 
 			int len = sentence.getEnd() - sentence.getBegin();
-			//TODO reformat 4 following lines
-			if (len <= 1 || sentence.getCoveredText().equals("")) { // skip
-																	// empty
-																	// sentences
+
+			if (len <= 1 || sentence.getCoveredText().equals("")) {
+				// skip empty sentence
 				continue;
 			}
 
@@ -129,10 +130,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 * @param aJCas The Cas that is filled.
 	 * @param sentOffset Begin offset of the current sentence.
 	 * @param units Unit objects within this sentence.
-	 *
-	 * @param begin Begin offset of the current unit (relative to the current sentence only).
 	 */
-	//TODO oben: begin nicht mehr aktuell, oder?
 	
 	private void writeToCAS(JCas aJCas, ArrayList<Unit> units, int sentOffset) {
 
@@ -143,10 +141,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			if (begin == 0) {
 				begin = unit.begin + sentOffset;
 			}
-			if (units.get(i).label.equals("N")) {
-				//TODO kein statement enthalten -> Bedingung negieren
-				// we are still inside the token (do nothing)
-			} else {
+			if (!units.get(i).label.equals("N")) {
 				// reached end of token
 				int end = unit.end + sentOffset;
 				Token annotation = new Token(aJCas);
@@ -171,13 +166,13 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	private void handleLastCharacter(JCas aJCas, Sentence sentence) {
 
 		String sentText = sentence.getCoveredText();
-		//TODO heavy coding convention violation!
-		EOSSymbols E = new EOSSymbols();
+
+		EOSSymbols eosSymbols = new EOSSymbols();
 
 		if (sentText.length() > 1) {
 			String lastChar = sentText.substring(sentText.length() - 1,
 					sentText.length());
-			if (E.contains(lastChar)) {
+			if (eosSymbols.contains(lastChar)) {
 				// annotate it as separate token
 				Token annotation = new Token(aJCas);
 				annotation.setBegin(sentence.getEnd() - 1);

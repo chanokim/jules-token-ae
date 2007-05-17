@@ -35,7 +35,6 @@ import de.julielab.jules.types.Token;
 
 import junit.framework.TestCase;
 
-//TODO sind Descriptoen (TypenSystem) aktuell?
 public class TokenAnnotatorTest extends TestCase {
 
 	/**
@@ -56,7 +55,9 @@ public class TokenAnnotatorTest extends TestCase {
 		PropertyConfigurator.configure("src/test/java/log4j.properties");
 	}
 
-	//TODO add comment
+	/**
+	 * initialize a CAS which is then used for the test. 2 sentences are added
+	 */
 	public void initCas(JCas jcas) {
 		jcas.reset();
 		jcas.setDocumentText(TEST_TEXT);
@@ -71,7 +72,7 @@ public class TokenAnnotatorTest extends TestCase {
 		s2.addToIndexes();
 	}
 
-	//TODO extract method
+	// TODO extract method
 	public void testProcess() {
 
 		boolean annotationsOK = true;
@@ -96,8 +97,6 @@ public class TokenAnnotatorTest extends TestCase {
 			LOGGER.error("testProcess()", e);
 		}
 
-		//TODO is the name of the method justified if you have to add a comment for this line?
-		// get test cas with sentence annotation
 		initCas(jcas);
 
 		try {
@@ -110,8 +109,17 @@ public class TokenAnnotatorTest extends TestCase {
 		JFSIndexRepository indexes = jcas.getJFSIndexRepository();
 		Iterator tokIter = indexes.getAnnotationIndex(Token.type).iterator();
 
-		String predictedOffsets = "";
+		String predictedOffsets = getPredictedOffsets(tokIter);
 
+		// compare offsets
+		if (!predictedOffsets.equals(TEST_TEXT_OFFSETS)) {
+			annotationsOK = false;
+		}
+		assertTrue(annotationsOK);
+	}
+
+	private String getPredictedOffsets(Iterator tokIter) {
+		String predictedOffsets="";
 		while (tokIter.hasNext()) {
 			Token t = (Token) tokIter.next();
 			if (LOGGER.isDebugEnabled()) {
@@ -126,12 +134,7 @@ public class TokenAnnotatorTest extends TestCase {
 			LOGGER.debug("testProcess() - predicted: " + predictedOffsets);
 			LOGGER.debug("testProcess() -    wanted: " + TEST_TEXT_OFFSETS);
 		}
-
-		// compare offsets
-		if (!predictedOffsets.equals(TEST_TEXT_OFFSETS)) {
-			annotationsOK = false;
-		}
-		assertTrue(annotationsOK);
+		return predictedOffsets;
 	}
 
 }
