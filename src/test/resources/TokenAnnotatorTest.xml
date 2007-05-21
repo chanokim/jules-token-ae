@@ -7,7 +7,7 @@
 	<analysisEngineMetaData>
 		<name>Token Annotator</name>
 		<description></description>
-		<version>1.1</version>
+		<version>1.2</version>
 		<vendor>julielab</vendor>
 		
 		
@@ -25,7 +25,7 @@
 			<nameValuePair>
 				<name>ModelFilename</name>
 				<value>
-					<string>src/test/resources/TokenAnnotatorTest.mod</string>
+					<string>src/test/resources/TokenAnnotatorTest.mod.gz</string>
 				</value>
 			</nameValuePair>
 		</configurationParameterSettings>

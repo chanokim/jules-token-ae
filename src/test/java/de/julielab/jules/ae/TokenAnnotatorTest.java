@@ -7,7 +7,7 @@
  *
  * Author: tomanek
  * 
- * Current version: 1.1	
+ * Current version: 1.2	
  * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
