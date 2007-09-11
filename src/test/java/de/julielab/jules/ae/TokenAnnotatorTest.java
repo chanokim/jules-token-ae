@@ -7,7 +7,7 @@
  *
  * Author: tomanek
  * 
- * Current version: 1.2	
+ * Current version: 1.2.3	
  * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
@@ -45,14 +45,14 @@ public class TokenAnnotatorTest extends TestCase {
 
 	private static final String DESCRIPTOR = "src/test/resources/TokenAnnotatorTest.xml";
 
-	private static final String TEST_TEXT = "CD44, at any stage, is a XYZ! CD44-related stuff (not).";
+	private static final String TEST_TEXT = "CD44, at any stage, is a XYZ! CD44-related stuff \t(not).";
 
-	private static final String TEST_TEXT_OFFSETS = "0-4;4-5;6-8;9-12;13-18;18-19;20-22;23-24;25-28;28-29;30-34;34-35;35-42;43-48;49-50;50-53;53-54;54-55";
+	private static final String TEST_TEXT_OFFSETS = "0-4;4-5;6-8;9-12;13-18;18-19;20-22;23-24;25-28;28-29;30-34;34-35;35-42;43-48;50-51;51-54;54-55";
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		// set log4j properties file
-		PropertyConfigurator.configure("src/test/java/log4j.properties");
+		PropertyConfigurator.configure("src/test/resources/log4j.properties");
 	}
 
 	/**
@@ -61,6 +61,7 @@ public class TokenAnnotatorTest extends TestCase {
 	public void initCas(JCas jcas) {
 		jcas.reset();
 		jcas.setDocumentText(TEST_TEXT);
+		
 		Sentence s1 = new Sentence(jcas);
 		s1.setBegin(0);
 		s1.setEnd(29);
@@ -72,7 +73,7 @@ public class TokenAnnotatorTest extends TestCase {
 		s2.addToIndexes();
 	}
 
-	// TODO extract method
+
 	public void testProcess() {
 
 		boolean annotationsOK = true;

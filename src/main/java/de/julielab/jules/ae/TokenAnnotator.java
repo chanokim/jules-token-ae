@@ -7,7 +7,7 @@
  *
  * Author: tomanek
  * 
- * Current version: 1.2 	
+ * Current version: 1.2.3
  * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
@@ -45,9 +45,9 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 * Logger for this class
 	 */
 	private static final Logger LOGGER = Logger.getLogger(TokenAnnotator.class);
-	
+
 	private static final String COMPONENT_ID = "JULIE Token Boundary Detector";
-	
+
 	private Tokenizer tokenizer;
 
 	/**
@@ -58,7 +58,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	public void initialize(UimaContext aContext)
 			throws ResourceInitializationException {
 
-		LOGGER.info("[JTBD] initializing...");
+		LOGGER.info("initialize() - JTBD initializing...");
 
 		// invoke default initialization
 		super.initialize(aContext);
@@ -74,7 +74,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		try {
 			tokenizer.readModel(modelFilename);
 		} catch (Exception e) {
-			LOGGER.error("[JSBD] Could not load tokenizer model: "
+			LOGGER.error("initialize() - Could not load tokenizer model: "
 					+ e.getMessage());
 			throw new ResourceInitializationException();
 		}
@@ -85,11 +85,10 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 */
 	public void process(JCas aJCas) {
 
-		LOGGER.info("[JTBD] processing document...");
-
 		// get all sentences
 		JFSIndexRepository indexes = aJCas.getJFSIndexRepository();
-		Iterator sentenceIter = indexes.getAnnotationIndex(Sentence.type).iterator();
+		Iterator sentenceIter = indexes.getAnnotationIndex(Sentence.type)
+				.iterator();
 
 		int sentOffset = 0;
 
@@ -106,32 +105,42 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			ArrayList<Unit> units;
 			try {
 				units = tokenizer.predict(sentence.getCoveredText());
+				sentOffset = sentence.getBegin();
+				
+				if (units == null || units.size() == 0) {
+					// ignore this sentence as it has no predictions!
+					LOGGER.warn("writeToCAS() - current sentence was not handled by JTBD: " + sentence.getCoveredText());
+				} else {
+					writeToCAS(aJCas, units, sentOffset);
+					handleLastCharacter(aJCas, sentence);
+				}
+
 			} catch (JTBDException e) {
-				LOGGER.error("[JTBD] Error while predicting with JTBD: "
-						+ e.getMessage());
-				throw new RuntimeException();
+				// if there is an exception during predicting the current
+				// sentence
+				// throw an error and omit this sentence!
+				LOGGER
+						.error("process() - Error while predicting with JTBD. Sentence omitted!\n"
+								+ e.getMessage());
 			}
 
-			// write the tokens found to CAS
-			sentOffset = sentence.getBegin();
-			writeToCAS(aJCas, units, sentOffset);
-
-			// handle last char of sentence:
-			handleLastCharacter(aJCas, sentence);
-		} 
+		}
 	}
 
-
 	/**
-	 * Writes tokens identified to CAS by interpreting the Unit objects. JTBD splits 
-	 * each sentence into several units (see Medinfo paper) and decides for each such
-	 * unit whether it is at the end of a token or not (label "N" means: not at the end).
+	 * Writes tokens identified to CAS by interpreting the Unit objects. JTBD
+	 * splits each sentence into several units (see Medinfo paper) and decides
+	 * for each such unit whether it is at the end of a token or not (label "N"
+	 * means: not at the end).
 	 * 
-	 * @param aJCas The Cas that is filled.
-	 * @param sentOffset Begin offset of the current sentence.
-	 * @param units Unit objects within this sentence.
+	 * @param aJCas
+	 *            The Cas that is filled.
+	 * @param sentOffset
+	 *            Begin offset of the current sentence.
+	 * @param units
+	 *            Unit objects within this sentence.
 	 */
-	
+
 	private void writeToCAS(JCas aJCas, ArrayList<Unit> units, int sentOffset) {
 
 		int begin = 0;
@@ -152,16 +161,17 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				begin = 0;
 			}
 		}
+
 	}
 
-	
-	
 	/**
 	 * Write last character of a sentence as separate token (if it is a known
 	 * end-of-sentence symbol).
 	 * 
-	 * @param aJCas The Cas that will contain the token.
-	 * @param sentence The current sentence.
+	 * @param aJCas
+	 *            The Cas that will contain the token.
+	 * @param sentence
+	 *            The current sentence.
 	 */
 	private void handleLastCharacter(JCas aJCas, Sentence sentence) {
 
@@ -182,5 +192,5 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			}
 		}
 	}
-	
+
 }

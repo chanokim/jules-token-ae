@@ -7,7 +7,7 @@
   <groupId>de.julielab</groupId>
   <artifactId>jules-token-ae</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.2</version>
+  <version>1.2.3</version>
   <description>UIMA Wrapper for JULIE Token Boundary Detector</description>
 
   <parent>
@@ -20,7 +20,7 @@
     <dependency>
       <groupId>de.julielab</groupId>
       <artifactId>jtbd</artifactId>
-      <version>1.6</version>
+      <version>1.6.1</version>
     </dependency>
     <dependency>
       <groupId>de.julielab</groupId>
