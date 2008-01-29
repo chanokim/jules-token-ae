@@ -7,7 +7,7 @@
 \pagestyle{plain}
 
 \title{\small{Documentation for}\\\huge UIMA Wrapper for JULIE Token Boundary Detector
-  (UIMA-JTBD-1.2)}
+  (UIMA-JTBD-2.0)}
 
 \author{\normalsize Katrin Tomanek\\
   \normalsize  Jena University Language \& Information Engineering (JULIE) Lab\\
@@ -29,7 +29,7 @@ contains several NLP components (all UIMA compliant) from sentence
 splitting to named entity recognition and normalization as well as a
 comprehensive UIMA type system.
 
-UIMA-JTBD is currently available in version 1.2. UIMA-JTBD is an UIMA
+UIMA-JTBD is currently available in version 2.0. UIMA-JTBD is an UIMA
 wrapper for JTBD, the respective command-line version. For more
 detailed information on the functioning of JTBD check the JTBD
 documentation or refer to \cite{Tomanek2007a}.
@@ -74,11 +74,11 @@ was not tested with other UIMA versions.
 % ref to our type system
 The input and output of an AE takes place by annotation objects. The
 classes corresponding to these objects are part of a \emph{JULIE UIMA
-  Type System}\footnote{The \emph{JULIE UIMA type system} can be
-  obtained from \url{http://www.julielab.de/}}.
+  Type System} in its current version 2.0.\footnote{The \emph{JULIE UIMA type system} can be
+  obtained separately from \url{http://www.julielab.de/}. However, the type system is already contained in this PEAR package.}
 
-UIMA-JTBD-1.2 is based on JTBD-1.6 which employs the machine learning
-toolkit MALLET \cite{mallet}.
+UIMA-JTBD-1.2 is based on JTBD-1.6.1 which employs the machine learning
+toolkit MALLET \cite{McCallum2002}.
 
 
 
@@ -134,7 +134,7 @@ UIMA-JTBD you need to provide the information as specified in Table
     \hline
     Overall Identification Information & Name &  Token Annotator \\
     \cline{2-3}
-    & Version &  1.2 \\
+    & Version &  2.0 \\
     \cline{2-3}
     & Vendor & JULIE Lab\\
     \cline{2-3}
@@ -242,7 +242,7 @@ The license is approved by the Open Source Initiative, and is
 available from their website at \url{http://www.opensource.org}.
 
 \bibliographystyle{alpha}
-\bibliography{/home/tomanek/coling/biblio/literature.bib}
+\bibliography{literature}
 
 
 \end{document}
