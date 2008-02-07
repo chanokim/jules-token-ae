@@ -27,7 +27,7 @@
 </configurationParameterSettings>
 <typeSystemDescription>
 <imports>
-<import location="julie-morpho-syntax-types.xml"/>
+<import location="../../../src/main/resources/julie-morpho-syntax-types.xml"/>
 </imports>
 </typeSystemDescription>
 <capabilities>
