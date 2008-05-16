@@ -6,14 +6,16 @@
 \usepackage{ucs} 
 \pagestyle{plain}
 
-\title{\small{Documentation for}\\\huge UIMA Wrapper for JULIE Token Boundary Detector
-  (UIMA-JTBD-2.0)}
+\title{\small{Documentation for}\\\huge JULIE Lab Token Boundary Detector\\\vspace{3mm}\small{Version 2.1}}
+
 
 \author{\normalsize Katrin Tomanek\\
   \normalsize  Jena University Language \& Information Engineering (JULIE) Lab\\
   \normalsize F\"urstengraben 30 \\
   \normalsize D-07743 Jena, Germany\\
-  {\normalsize \tt tomanek@coling-uni-jena.de} }
+  {\normalsize \tt katrin.tomanek@uni-jena.de} }
+
+
 
 
 \date{}
@@ -23,16 +25,16 @@
 
 \section{Objective}
 
-UIMA-JTBD is a sentence boundary detector for UIMA.  It is part of
-the JULIE NLP tool suite\footnote{\url{http://www.julielab.de/}} which
-contains several NLP components (all UIMA compliant) from sentence
-splitting to named entity recognition and normalization as well as a
-comprehensive UIMA type system.
+The JULIE Lab Token Boundary Detector (UIMA-JTBD) is a token boundary
+detector for UIMA.  It is part of the JULIE Lab NLP tool
+suite\footnote{\url{http://www.julielab.de/}} which contains several
+NLP components (all UIMA compliant) from sentence splitting to named
+entity recognition and normalization as well as a comprehensive UIMA
+type system.
 
-UIMA-JTBD is currently available in version 2.0. UIMA-JTBD is an UIMA
-wrapper for JTBD, the respective command-line version. For more
-detailed information on the functioning of JTBD check the JTBD
-documentation or refer to \cite{Tomanek2007a}.
+UIMA-JTBD is an UIMA wrapper for JTBD, the respective command-line
+version. For more detailed information on the functioning of JTBD
+check the JTBD documentation or refer to \cite{Tomanek2007a}.
 
 \section{Installation}
 
@@ -44,21 +46,21 @@ installation folder. This directory contains a descriptor
 Collection Proeccessing Engine Configurator (\url{cpeGUI.sh}) and add
 UIMA-JTBD as a component into your NLP pipeline.
 
-This pear package also contains a model for sentence splitting. The
-model was trained on a special bio-medical corpus which consists of data from (manually
-annotated) material which we took from MedLine abstracts and a
-modified version of
+This pear package also contains a model for tokenization splitting. The
+model was trained on a special bio-medical corpus which consists of
+data from (manually annotated) material which we took from MedLine
+abstracts and a modified version of
 \textsc{PennBioIE}'s\footnote{\url{http://bioie.ldc.upenn.edu/}}
 underlying tokenization. In the \textsc{PennBioIE} corpus, some purely
 alphanumeric strings are divided into smaller tokens to support
 \textsc{PennBioIE}'s entity annotation, especially in a common
-annotation for variation events (e.g.  "S45F" with "S"=state\_original,
-"45"=location, "F"=state\_altered).  Those splits were (manually)
-undone to fit our tokenization guidelines.
-Currently, our tokenization corpus comprises about 36000 sentences.
-An accuracy of ACC=96.7\% is reached on this data using 10-fold
-cross-validation.  You will find the model trained on this data in the
-directory \url{resources}.
+annotation for variation events (e.g.  "S45F" with
+"S"=state\_original, "45"=location, "F"=state\_altered).  Those splits
+were (manually) undone to fit our tokenization guidelines.  Currently,
+our tokenization corpus comprises about 36000 sentences.  An accuracy
+of ACC=96.7\% is reached on this data using 10-fold cross-validation.
+You will find the model trained on this data in the directory
+\url{resources}.
 
 %\section{Changelog}
 % uncomment when needed
@@ -67,18 +69,20 @@ directory \url{resources}.
 \section{Requirements and Dependencies}
 
 % mostly our tools will be based on java 1.5 and use UIMA
-UIMA-JTBD is written in Java 1.5 using Apache UIMA version
-2.1.0-incubation\footnote{\url{http://incubator.apache.org/uima/}}. It
-was not tested with other UIMA versions.
+UIMA-JTBD is written in Java (version 1.5 or above required) using
+Apache UIMA version
+2.2.1-incubation\footnote{\url{http://incubator.apache.org/uima/}}.
 
 % ref to our type system
 The input and output of an AE takes place by annotation objects. The
-classes corresponding to these objects are part of a \emph{JULIE UIMA
-  Type System} in its current version 2.0.\footnote{The \emph{JULIE UIMA type system} can be
-  obtained separately from \url{http://www.julielab.de/}. However, the type system is already contained in this PEAR package.}
+classes corresponding to these objects are part of the \emph{JULIE Lab
+  UIMA Type System} in its current version (2.1).\footnote{The
+  \emph{JULIE Lab UIMA type system} can be separately obtained from
+  \url{http://www.julielab.de/}, however, this package already
+  includes the necessary parts of the type system.}
 
-UIMA-JTBD-1.2 is based on JTBD-1.6.1 which employs the machine learning
-toolkit MALLET \cite{McCallum2002}.
+UIMA-JTBD in its current version is based on JTBD-1.6.1 which employs
+the machine learning toolkit MALLET \cite{McCallum2002}.
 
 
 
@@ -88,7 +92,7 @@ toolkit MALLET \cite{McCallum2002}.
 
 In UIMA, each component is configured by a descriptor in XML. In the
 following we describe how the descriptor required by this AE can be
-created with \emph{Component Descriptor Editor}, an Eclipse plugin
+created with the \emph{Component Descriptor Editor}, an Eclipse plugin
 which is part of the UIMA SDK.
 
 A descriptor contains information on different aspects. The following
@@ -97,7 +101,7 @@ the Component Descriptor Editor, a separate \emph{tabbed page}. For an
 indepth description of the respective configuration aspects or tabs,
 please refer to the \emph{UIMA SKD User's
   Guide}\footnote{\url{http://incubator.apache.org/uima/}}, especially
-chapter 12 on ``Component Descriptor Editor User's Guide''.
+the chapter on ``Component Descriptor Editor User's Guide''.
 
 To define your own descriptor go through each tabbed pages mentioned
 here, make your respective entries (especially in page \emph{Parameter
@@ -124,17 +128,17 @@ UIMA-JTBD you need to provide the information as specified in Table
     \cline{2-3}
     & Engine Type & primitive \\
     \hline
-    Runtime Information & updates the CAS & check \\
+    Runtime Information & updates the CAS & yes \\
     \cline{2-3}
-    & multiple deployment allowed & check \\
+    & multiple deployment allowed & yes \\
     \cline{2-3}
-    & outputs new CASes &  don't check \\
+    & outputs new CASes &  no \\
     \cline{2-3}
     & Name of the Java class file & \url{de.julielab.jules.ae.TokenAnnotator}\\
     \hline
     Overall Identification Information & Name &  Token Annotator \\
     \cline{2-3}
-    & Version &  2.0 \\
+    & Version &  2.1 \\
     \cline{2-3}
     & Vendor & JULIE Lab\\
     \cline{2-3}
@@ -164,8 +168,7 @@ Groups'' in this tab.
     \hline
     Parameter Name & Parameter Type & Mandatory & Multivalued & Description \\
     \hline\hline
-    ModelFilename & String & yes & no & filename of trained model for
-    JTBD\\
+    ModelFilename & String & yes & no & filename to model trained for JTBD\\
     \hline
   \end{tabular}
   \caption{Parameters of this AE.}
@@ -189,7 +192,7 @@ parameter settings of this AE.
     \hline
     Parameter Name & Parameter Syntax & Example \\
     \hline\hline
-    ModelFilename & full path & \url{/home/tomanek/JULIE_token.mod}\\
+    ModelFilename & full path & \url{resources/JULIE_life-science-1.6.mod.gz}\\
     \hline
   \end{tabular}
   \caption{Parameter settings of this AE.}
@@ -233,7 +236,7 @@ Nothing needs to be done here.
 
 \section{Copyright and License}
 % leave unchanged
-This software is Copyright (C) 2007 Jena University Language \& Information
+This software is Copyright (C) 2008 Jena University Language \& Information
 Engineering Lab (Friedrich-Schiller University Jena, Germany), and is
 licensed under the terms of the Common Public License, Version 1.0 or (at
 your option) any subsequent version.
