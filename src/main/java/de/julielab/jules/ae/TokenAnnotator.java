@@ -91,9 +91,21 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			Sentence sentence = (Sentence) sentenceIter.next();
 
 			int len = sentence.getEnd() - sentence.getBegin();
-
+			
+			/*
+			 * some debugging...
+			 */
+			LOGGER.debug("process() - going to next sentence having length: " + len);
+			String text = sentence.getCoveredText();
+			if (text==null) {
+				LOGGER.debug("process() - current sentence with length " + len + " has NO COVERED TEXT!");
+			} else {
+				LOGGER.debug("process() - sentence text: : " + sentence.getCoveredText());
+			}
+			
+			// we wanna skip empty sentence
 			if (len <= 1 || sentence.getCoveredText().equals("")) {
-				// skip empty sentence
+
 				continue;
 			}
 
