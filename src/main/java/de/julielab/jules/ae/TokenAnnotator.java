@@ -13,7 +13,7 @@
  * Creation date: Nov 29, 2006 
  * 
  * This is an UIMA wrapper for the JULIE Token Boundary Detector (JTBD). It produces token annotations, 
- * given sentence annotations. Each sentence is seperately split into its single tokens.
+ * given sentence annotations. Each sentence is separately split into its single tokens. It 
  * 
  * 
  * TODO: double-check whether last symbol is always correctly tokenized!
@@ -25,11 +25,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
-import org.apache.uima.jcas.JFSIndexRepository;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.JFSIndexRepository;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import de.julielab.jtbd.EOSSymbols;
@@ -46,6 +45,10 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	private static final Logger LOGGER = Logger.getLogger(TokenAnnotator.class);
 
 	private static final String COMPONENT_ID = "JULIE Token Boundary Detector";
+	
+	private static final String USE_DOC_TEXT_PARAM = "UseDocTextIfNoSentenceIsFound";
+	
+	private boolean useCompleteDocText = false;
 
 	private Tokenizer tokenizer;
 
@@ -65,6 +68,15 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
 		// get modelfilename from parameters
 		modelFilename = (String) aContext.getConfigParameterValue("ModelFilename");
+		
+		// define if sentence annotations should be taken into account
+		
+		useCompleteDocText = (Boolean) aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);
+		if (useCompleteDocText){
+			LOGGER.info("initialize() - whole documentText is used, if no sentence annotations are found.");
+			LOGGER.info(" ... terminal 'end-of-sentence' characters as specified in jtbd.EOSSymbols are " +
+					"not considered during tokenization." );
+		}
 
 		// load model
 		tokenizer = new Tokenizer();
@@ -85,44 +97,64 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		JFSIndexRepository indexes = aJCas.getJFSIndexRepository();
 		Iterator sentenceIter = indexes.getAnnotationIndex(Sentence.type).iterator();
 
-		int sentOffset = 0;
-
-		while (sentenceIter.hasNext()) {
-			Sentence sentence = (Sentence) sentenceIter.next();
-
-			int len = sentence.getEnd() - sentence.getBegin();
-			
-			/*
-			 * some debugging...
-			 */
-			LOGGER.debug("process() - going to next sentence having length: " + len);
-			String text = sentence.getCoveredText();
-			if (text==null) {
-				LOGGER.debug("process() - current sentence with length " + len + " has NO COVERED TEXT!");
+		
+		// if no sentence annotation is found and useCompleteDocText is true, tokenize complete documentText
+		if (!sentenceIter.hasNext() && useCompleteDocText){			
+			LOGGER.debug("process() - no sentence annotations found, tokenizing whole document text!");		
+			String docText = aJCas.getDocumentText();			
+			if (docText != null && !docText.isEmpty()) {			
+				int len = aJCas.getDocumentText().length(); //TODO test				
+				ArrayList<Unit> units;
+				units = tokenizer.predict(docText);
+				if (units == null || units.size() == 0) {
+					// ignore this documentText as it has no predictions!
+					LOGGER.warn("writeToCAS() - documentText was not handled by JTBD: " + docText);
+				} else {
+					writeToCAS(aJCas, units, 0);
+				}				
 			} else {
-				LOGGER.debug("process() - sentence text: : " + sentence.getCoveredText());
+				LOGGER.info("process() - could not tokenize, empty document text");
 			}
-			
-			// we wanna skip empty sentence
-			if (len <= 1 || sentence.getCoveredText().equals("")) {
-
-				continue;
-			}
-
-			ArrayList<Unit> units;
-
-			units = tokenizer.predict(sentence.getCoveredText());
-			sentOffset = sentence.getBegin();
-
-			if (units == null || units.size() == 0) {
-				// ignore this sentence as it has no predictions!
-				LOGGER.warn("writeToCAS() - current sentence was not handled by JTBD: " + sentence.getCoveredText());
-			} else {
-				writeToCAS(aJCas, units, sentOffset);
-				handleLastCharacter(aJCas, sentence);
-			}
-
 		}
+		else {
+			int sentOffset = 0;
+			while (sentenceIter.hasNext()) {
+
+				Sentence sentence = (Sentence) sentenceIter.next();
+	
+				int len = sentence.getEnd() - sentence.getBegin();
+				
+				/*
+				 * some debugging...
+				 */
+				LOGGER.debug("process() - going to next sentence having length: " + len);
+				String text = sentence.getCoveredText();
+				if (text==null) {
+					LOGGER.debug("process() - current sentence with length " + len + " has NO COVERED TEXT!");
+				} else {
+					LOGGER.debug("process() - sentence text: : " + sentence.getCoveredText());
+				}
+				
+				// we wanna skip empty sentence
+				if (len <= 1 || sentence.getCoveredText().equals("")) {
+	
+					continue;
+				}
+	
+				ArrayList<Unit> units;
+	
+				units = tokenizer.predict(sentence.getCoveredText());
+				sentOffset = sentence.getBegin();
+	
+				if (units == null || units.size() == 0) {
+					// ignore this sentence as it has no predictions!
+					LOGGER.warn("writeToCAS() - current sentence was not handled by JTBD: " + sentence.getCoveredText());
+				} else {
+					writeToCAS(aJCas, units, sentOffset);
+					handleLastCharacter(aJCas, sentence);
+				}
+			}
+		}		
 	}
 
 	/**
@@ -144,6 +176,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
+			System.out.println(unit.begin + "-" + unit.end);
 			if (begin == 0) {
 				begin = unit.begin + sentOffset;
 			}
@@ -155,6 +188,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				annotation.setEnd(end);
 				annotation.setComponentId("JULIE Token Boundary Detector");
 				annotation.addToIndexes();
+				System.out.println("setting " + begin + "-" + end);//TODO remove
 				begin = 0;
 			}
 		}

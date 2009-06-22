@@ -48,7 +48,7 @@ public class TokenAnnotatorTest extends TestCase {
 	private static final String TEST_TEXT = "CD44, at any stage, is a XYZ! CD44-related stuff \t(not).";
 
 	private static final String TEST_TEXT_OFFSETS = "0-4;4-5;6-8;9-12;13-18;18-19;20-22;23-24;25-28;28-29;30-34;34-35;35-42;43-48;50-51;51-54;54-55";
-
+	
 	protected void setUp() throws Exception {
 		super.setUp();
 		// set log4j properties file
@@ -72,8 +72,18 @@ public class TokenAnnotatorTest extends TestCase {
 		s2.setEnd(55);
 		s2.addToIndexes();
 	}
+	
+	/**
+	 * initialize a CAS which is then used for the test, the CAS holds no token annotations
+	 */
+	public void initCasWithoutTokens(JCas jcas) {
+		jcas.reset();
+		jcas.setDocumentText(TEST_TEXT);
+	}
 
-
+	/**
+	 * Test CAS with sentence annotations.
+	 */
 	public void testProcess() {
 
 		boolean annotationsOK = true;
@@ -97,19 +107,15 @@ public class TokenAnnotatorTest extends TestCase {
 		} catch (ResourceInitializationException e) {
 			LOGGER.error("testProcess()", e);
 		}
-
 		initCas(jcas);
-
 		try {
 			tokenAnnotator.process(jcas, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		// get the offsets of the sentences
 		JFSIndexRepository indexes = jcas.getJFSIndexRepository();
 		Iterator tokIter = indexes.getAnnotationIndex(Token.type).iterator();
-
 		String predictedOffsets = getPredictedOffsets(tokIter);
 
 		// compare offsets
@@ -117,6 +123,51 @@ public class TokenAnnotatorTest extends TestCase {
 			annotationsOK = false;
 		}
 		assertTrue(annotationsOK);
+	}
+	
+	/**
+	 * Test CAS without sentence annotations.
+	 */
+	public void testProcessWithoutSentenceAnnotations() {
+		boolean annotationsOK = true;
+
+		XMLInputSource tokenXML = null;
+		ResourceSpecifier tokenSpec = null;
+		AnalysisEngine tokenAnnotator = null;
+
+		try {
+			tokenXML = new XMLInputSource(DESCRIPTOR);
+			tokenSpec = UIMAFramework.getXMLParser().parseResourceSpecifier(
+					tokenXML);
+			tokenAnnotator = UIMAFramework.produceAnalysisEngine(tokenSpec);
+		} catch (Exception e) {
+			LOGGER.error("testProcess()", e);
+		}
+		
+		JCas jcas = null;
+		try {
+			jcas = tokenAnnotator.newJCas();
+		} catch (ResourceInitializationException e) {
+			LOGGER.error("testProcess()", e);
+		}
+		initCasWithoutTokens(jcas);
+		try {
+			tokenAnnotator.process(jcas, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// get the predicted token offsets 
+		JFSIndexRepository indexes = jcas.getJFSIndexRepository();
+		Iterator tokIter = indexes.getAnnotationIndex(Token.type).iterator();
+		String predictedOffsets = getPredictedOffsets(tokIter);
+		if (predictedOffsets == null) System.out.println("null");
+
+		// compare offsets
+		if (!predictedOffsets.equals(TEST_TEXT_OFFSETS)) {
+			annotationsOK = false;
+		}
+		assertTrue(annotationsOK);
+		
 	}
 
 	private String getPredictedOffsets(Iterator tokIter) {

@@ -16,12 +16,25 @@
         <multiValued>false</multiValued>
         <mandatory>true</mandatory>
       </configurationParameter>
+      <configurationParameter>
+        <name>UseDocTextIfNoSentenceIsFound</name>
+        <description>Defines if whole CAS documentText should be used if no sentence annotation is found. Useful for example, if documentText is a multi word term, instead of a whole article or abstract consisting of sentences.</description>
+        <type>Boolean</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
     </configurationParameters>
     <configurationParameterSettings>
       <nameValuePair>
         <name>ModelFilename</name>
         <value>
           <string>src/test/resources/testing.mod.gz</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>UseDocTextIfNoSentenceIsFound</name>
+        <value>
+          <boolean>true</boolean>
         </value>
       </nameValuePair>
     </configurationParameterSettings>
