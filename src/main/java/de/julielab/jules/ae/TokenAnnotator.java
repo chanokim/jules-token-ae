@@ -7,7 +7,7 @@
  *
  * Author: tomanek
  * 
- * Current version: 2.0
+ * Current version: 2.2.3
  * Since version:   1.0
  *
  * Creation date: Nov 29, 2006 
@@ -72,11 +72,13 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		// define if sentence annotations should be taken into account
 		
 		useCompleteDocText = (Boolean) aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);
+		
 		if (useCompleteDocText){
 			LOGGER.info("initialize() - whole documentText is used, if no sentence annotations are found.");
 			LOGGER.info(" ... terminal 'end-of-sentence' characters as specified in jtbd.EOSSymbols are " +
 					"not considered during tokenization." );
 		}
+		else LOGGER.info("initialize() - tokenize only text covered by sentence annotations");
 
 		// load model
 		tokenizer = new Tokenizer();
@@ -102,10 +104,8 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		if (!sentenceIter.hasNext() && useCompleteDocText){			
 			LOGGER.debug("process() - no sentence annotations found, tokenizing whole document text!");		
 			String docText = aJCas.getDocumentText();			
-			if (docText != null && !docText.isEmpty()) {			
-				int len = aJCas.getDocumentText().length(); //TODO test				
-				ArrayList<Unit> units;
-				units = tokenizer.predict(docText);
+			if (docText != null && !docText.isEmpty()) {						
+				ArrayList<Unit> units  = tokenizer.predict(docText);
 				if (units == null || units.size() == 0) {
 					// ignore this documentText as it has no predictions!
 					LOGGER.warn("writeToCAS() - documentText was not handled by JTBD: " + docText);
@@ -133,16 +133,13 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 					LOGGER.debug("process() - current sentence with length " + len + " has NO COVERED TEXT!");
 				} else {
 					LOGGER.debug("process() - sentence text: : " + sentence.getCoveredText());
-				}
-				
+				}				
 				// we wanna skip empty sentence
 				if (len <= 1 || sentence.getCoveredText().equals("")) {
-	
-					continue;
+					continue;				
 				}
 	
 				ArrayList<Unit> units;
-	
 				units = tokenizer.predict(sentence.getCoveredText());
 				sentOffset = sentence.getBegin();
 	
