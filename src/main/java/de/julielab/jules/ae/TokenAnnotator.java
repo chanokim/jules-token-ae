@@ -175,7 +175,6 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
-			System.out.println(unit.begin + "-" + unit.end);
 			if (begin == 0) {
 				begin = unit.begin + sentOffset;
 			}
@@ -187,7 +186,6 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				annotation.setEnd(end);
 				annotation.setComponentId("JULIE Token Boundary Detector");
 				annotation.addToIndexes();
-				System.out.println("setting " + begin + "-" + end);//TODO remove
 				begin = 0;
 			}
 		}
