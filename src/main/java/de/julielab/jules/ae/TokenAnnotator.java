@@ -49,6 +49,8 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	private static final String USE_DOC_TEXT_PARAM = "UseDocTextIfNoSentenceIsFound";
 
 	private Tokenizer tokenizer;
+	
+	boolean useCompleteDocText = false;
 
 	/**
 	 * Initialisiation of JTBD: load the model
@@ -67,11 +69,13 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		// get modelfilename from parameters
 		modelFilename = (String) aContext.getConfigParameterValue("ModelFilename");
 		
-		// define if sentence annotations should be taken into account
+		// define if sentence annotations should be taken into account		
+		Object useDocTextParam = aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);		
+		if (useDocTextParam != null ){
+			useCompleteDocText = (Boolean) useDocTextParam;
+		}
 		
-		Object useCompleteDocText = aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);
-		
-		if (useCompleteDocText != null && (Boolean) useCompleteDocText){
+		if (useCompleteDocText){ 
 				LOGGER.info("initialize() - whole documentText is used, if no sentence annotations are found.");
 //				LOGGER.info(" ... terminal 'end-of-sentence' characters (as specified in jtbd.EOSSymbols) are " +
 //						"not considered  tokenization." );
