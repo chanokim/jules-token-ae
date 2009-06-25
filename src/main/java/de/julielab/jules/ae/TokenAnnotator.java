@@ -47,8 +47,6 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	private static final String COMPONENT_ID = "JULIE Token Boundary Detector";
 	
 	private static final String USE_DOC_TEXT_PARAM = "UseDocTextIfNoSentenceIsFound";
-	
-	private boolean useCompleteDocText = false;
 
 	private Tokenizer tokenizer;
 
@@ -71,14 +69,14 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		
 		// define if sentence annotations should be taken into account
 		
-		useCompleteDocText = (Boolean) aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);
+		Object useCompleteDocText = aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);
 		
-		if (useCompleteDocText){
-			LOGGER.info("initialize() - whole documentText is used, if no sentence annotations are found.");
-			LOGGER.info(" ... terminal 'end-of-sentence' characters as specified in jtbd.EOSSymbols are " +
-					"not considered during tokenization." );
+		if (useCompleteDocText != null && (Boolean) useCompleteDocText){
+				LOGGER.info("initialize() - whole documentText is used, if no sentence annotations are found.");
+//				LOGGER.info(" ... terminal 'end-of-sentence' characters (as specified in jtbd.EOSSymbols) are " +
+//						"not considered  tokenization." );
 		}
-		else LOGGER.info("initialize() - tokenize only text covered by sentence annotations");
+		else LOGGER.info("initialize() - will tokenize only text covered by sentence annotations");
 
 		// load model
 		tokenizer = new Tokenizer();
