@@ -96,11 +96,13 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 * the process method is in charge of doing the tokenization
 	 */
 	public void process(JCas aJCas) {
-
+		
+		//count tokens (token number will be used as token id)
+		int tokenNumber = 1;
+		
 		// get all sentences
 		JFSIndexRepository indexes = aJCas.getJFSIndexRepository();
 		Iterator sentenceIter = indexes.getAnnotationIndex(Sentence.type).iterator();
-
 		
 		// if no sentence annotation is found and useCompleteDocText is true, tokenize complete documentText
 		if (!sentenceIter.hasNext() && useCompleteDocText){			
@@ -112,7 +114,8 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 					// ignore this documentText as it has no predictions!
 					LOGGER.warn("writeToCAS() - documentText was not handled by JTBD: " + docText);
 				} else {
-					writeToCAS(aJCas, units, 0);
+					writeToCAS(aJCas, units, 0, tokenNumber);
+					tokenNumber += units.size();
 				}				
 			} else {
 				LOGGER.info("process() - could not tokenize, empty document text");
@@ -131,7 +134,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				 */
 				LOGGER.debug("process() - going to next sentence having length: " + len);
 				String text = sentence.getCoveredText();
-				if (text==null) {
+				if (text == null) {
 					LOGGER.debug("process() - current sentence with length " + len + " has NO COVERED TEXT!");
 				} else {
 					LOGGER.debug("process() - sentence text: : " + sentence.getCoveredText());
@@ -149,8 +152,11 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 					// ignore this sentence as it has no predictions!
 					LOGGER.warn("writeToCAS() - current sentence was not handled by JTBD: " + sentence.getCoveredText());
 				} else {
-					writeToCAS(aJCas, units, sentOffset);
-					handleLastCharacter(aJCas, sentence);
+					writeToCAS(aJCas, units, sentOffset, tokenNumber);
+					tokenNumber += units.size();
+					if (handleLastCharacter(aJCas, sentence, tokenNumber)){
+						tokenNumber++;
+					}
 				}
 			}
 		}		
@@ -169,7 +175,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	 *            Unit objects within this sentence.
 	 */
 
-	private void writeToCAS(JCas aJCas, ArrayList<Unit> units, int sentOffset) {
+	private void writeToCAS(JCas aJCas, ArrayList<Unit> units, int sentOffset, int tokenNumber) {
 
 		int begin = 0;
 
@@ -184,9 +190,11 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				Token annotation = new Token(aJCas);
 				annotation.setBegin(begin);
 				annotation.setEnd(end);
+				annotation.setId("" + tokenNumber);
 				annotation.setComponentId("JULIE Token Boundary Detector");
 				annotation.addToIndexes();
 				begin = 0;
+				tokenNumber++;
 			}
 		}
 
@@ -194,14 +202,14 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
 	/**
 	 * Write last character of a sentence as separate token (if it is a known end-of-sentence
-	 * symbol).
+	 * symbol). Return true if a token is written, false otherwise.
 	 * 
 	 * @param aJCas
 	 *            The Cas that will contain the token.
 	 * @param sentence
 	 *            The current sentence.
 	 */
-	private void handleLastCharacter(JCas aJCas, Sentence sentence) {
+	private boolean handleLastCharacter(JCas aJCas, Sentence sentence, int tokenNumber) {
 
 		String sentText = sentence.getCoveredText();
 
@@ -214,10 +222,13 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				Token annotation = new Token(aJCas);
 				annotation.setBegin(sentence.getEnd() - 1);
 				annotation.setEnd(sentence.getEnd());
+				annotation.setId("" + tokenNumber);
 				annotation.setComponentId(COMPONENT_ID);
 				annotation.addToIndexes();
+				return true;
 			}
 		}
+		return false;
 	}
 
 }

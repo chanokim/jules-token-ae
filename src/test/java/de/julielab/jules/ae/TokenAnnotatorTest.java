@@ -48,6 +48,8 @@ public class TokenAnnotatorTest extends TestCase {
 	private static final String TEST_TEXT = "CD44, at any stage, is a XYZ! CD44-related stuff \t(not).";
 
 	private static final String TEST_TEXT_OFFSETS = "0-4;4-5;6-8;9-12;13-18;18-19;20-22;23-24;25-28;28-29;30-34;34-35;35-42;43-48;50-51;51-54;54-55";
+
+	private static final String TEST_TEXT_TOKEN_NUMBERS = "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17";
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -86,8 +88,6 @@ public class TokenAnnotatorTest extends TestCase {
 	 */
 	public void testProcess() {
 
-		boolean annotationsOK = true;
-
 		XMLInputSource tokenXML = null;
 		ResourceSpecifier tokenSpec = null;
 		AnalysisEngine tokenAnnotator = null;
@@ -117,19 +117,20 @@ public class TokenAnnotatorTest extends TestCase {
 		JFSIndexRepository indexes = jcas.getJFSIndexRepository();
 		Iterator tokIter = indexes.getAnnotationIndex(Token.type).iterator();
 		String predictedOffsets = getPredictedOffsets(tokIter);
-
+		tokIter = indexes.getAnnotationIndex(Token.type).iterator();
+		String tokenNumbers = getTokenNumbers(tokIter);
+		
 		// compare offsets
-		if (!predictedOffsets.equals(TEST_TEXT_OFFSETS)) {
-			annotationsOK = false;
-		}
-		assertTrue(annotationsOK);
+		assertEquals(TEST_TEXT_OFFSETS, predictedOffsets);
+		
+		// compare token numbers
+		assertEquals(TEST_TEXT_TOKEN_NUMBERS, tokenNumbers);
 	}
 	
 	/**
 	 * Test CAS without sentence annotations.
 	 */
 	public void testProcessWithoutSentenceAnnotations() {
-		boolean annotationsOK = true;
 
 		XMLInputSource tokenXML = null;
 		ResourceSpecifier tokenSpec = null;
@@ -160,13 +161,14 @@ public class TokenAnnotatorTest extends TestCase {
 		JFSIndexRepository indexes = jcas.getJFSIndexRepository();
 		Iterator tokIter = indexes.getAnnotationIndex(Token.type).iterator();
 		String predictedOffsets = getPredictedOffsets(tokIter);
-		if (predictedOffsets == null) System.out.println("null");
+		tokIter = indexes.getAnnotationIndex(Token.type).iterator();
+		String tokenNumbers = getTokenNumbers(tokIter);
 
 		// compare offsets
-		if (!predictedOffsets.equals(TEST_TEXT_OFFSETS)) {
-			annotationsOK = false;
-		}
-		assertTrue(annotationsOK);
+		assertEquals(TEST_TEXT_OFFSETS, predictedOffsets);
+		
+		// compare token numbers
+		assertEquals(TEST_TEXT_TOKEN_NUMBERS, tokenNumbers);
 		
 	}
 
@@ -187,6 +189,24 @@ public class TokenAnnotatorTest extends TestCase {
 			LOGGER.debug("testProcess() -    wanted: " + TEST_TEXT_OFFSETS);
 		}
 		return predictedOffsets;
+	}
+	
+	private String getTokenNumbers(Iterator tokIter) {
+		String tokenNumbers="";
+		while (tokIter.hasNext()) {
+			Token t = (Token) tokIter.next();
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("OUT: " + t.getCoveredText() + ": " + t.getId());
+			}
+			tokenNumbers += (tokenNumbers.length() > 0) ? ";" : "";
+			tokenNumbers += t.getId();
+		}
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("testProcess() - predicted: " + tokenNumbers);
+			LOGGER.debug("testProcess() -    wanted: " + TEST_TEXT_TOKEN_NUMBERS);
+		}
+		return tokenNumbers;
 	}
 
 }
