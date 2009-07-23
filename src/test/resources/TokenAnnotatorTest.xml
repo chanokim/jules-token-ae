@@ -28,7 +28,7 @@
       <nameValuePair>
         <name>ModelFilename</name>
         <value>
-          <string>src/test/resources/testing.mod.gz</string>
+          <string>src/test/resources/JTBD-2.0-biomed.mod.gz</string>
         </value>
       </nameValuePair>
       <nameValuePair>
