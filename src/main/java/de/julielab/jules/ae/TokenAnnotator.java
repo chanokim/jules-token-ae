@@ -47,7 +47,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 
 	private static final String COMPONENT_ID = "JULIE Token Boundary Detector";
 	
-	private static final String USE_DOC_TEXT_PARAM = "UseDocTextIfNoSentenceIsFound";
+	private static final String USE_DOC_TEXT_PARAM = "UseDocText";
 
 	private Tokenizer tokenizer;
 	

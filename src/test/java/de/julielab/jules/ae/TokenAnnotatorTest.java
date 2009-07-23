@@ -102,7 +102,7 @@ public class TokenAnnotatorTest extends TestCase {
 			tokenXML = new XMLInputSource(DESCRIPTOR);
 			tokenSpec = UIMAFramework.getXMLParser().parseResourceSpecifier(tokenXML);
 			tokenAnnotator = UIMAFramework.produceAnalysisEngine(tokenSpec);
-			tokenAnnotator.setConfigParameterValue("UseDocTextIfNoSentenceIsFound", false);
+			tokenAnnotator.setConfigParameterValue("UseDocText", false);
 			tokenAnnotator.reconfigure();
 		} catch (Exception e) {
 			LOGGER.error("testProcess()", e);
@@ -154,7 +154,7 @@ public class TokenAnnotatorTest extends TestCase {
 			tokenSpec = UIMAFramework.getXMLParser().parseResourceSpecifier(
 					tokenXML);
 			tokenAnnotator = UIMAFramework.produceAnalysisEngine(tokenSpec);
-			tokenAnnotator.setConfigParameterValue("UseDocTextIfNoSentenceIsFound", true);
+			tokenAnnotator.setConfigParameterValue("UseDocText", true);
 			tokenAnnotator.reconfigure();
 		} catch (Exception e) {
 			LOGGER.error("testProcess()", e);

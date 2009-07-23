@@ -17,7 +17,7 @@
         <mandatory>true</mandatory>
       </configurationParameter>
       <configurationParameter>
-        <name>UseDocTextIfNoSentenceIsFound</name>
+        <name>UseDocText</name>
         <description>Defines if whole CAS documentText should be used if no sentence annotation is found. Useful for example, if documentText is a multi word term, instead of a whole article or abstract consisting of sentences.</description>
         <type>Boolean</type>
         <multiValued>false</multiValued>
@@ -32,7 +32,7 @@
         </value>
       </nameValuePair>
       <nameValuePair>
-        <name>UseDocTextIfNoSentenceIsFound</name>
+        <name>UseDocText</name>
         <value>
           <boolean>true</boolean>
         </value>
