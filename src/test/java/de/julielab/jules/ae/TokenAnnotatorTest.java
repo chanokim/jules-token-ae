@@ -46,6 +46,7 @@ public class TokenAnnotatorTest extends TestCase {
 	private static final String DESCRIPTOR = "src/test/resources/TokenAnnotatorTest.xml";
 	
 	private static final String TEST_TERM = "alpha protein(s)";
+//	private static final String TEST_TERM = "Broadly speaking, TUFs can be classified into three categories: 1.";
 //	private static final String TEST_SENTENCES = "X-inactivation, T-cells and CD44 are XYZ! CD44-related " +
 //			"stuff is\t(not).";
 	private static final String TEST_SENTENCES = "X-inactivation, T-cells and CD44 are XYZ! CD44-related " +
@@ -53,10 +54,10 @@ public class TokenAnnotatorTest extends TestCase {
 
 	private static final String TEST_SENTENCES_OFFSETS = "0-14;14-15;16-23;24-27;28-32;33-36;37-40;40-41;" +
 			"42-46;46-47;47-54;55-60;61-63;64-65;65-68;68-69;69-70";
-	private static final String TEST_TERM_OFFSETS = "0-5;6-16";
+	private static final String TEST_TERM_OFFSETS = "0-5;6-13;13-14;14-15;15-16";
 
 	private static final String TEST_SENTENCES_TOKEN_NUMBERS = "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17";
-	private static final String TEST_TERM_TOKEN_NUMBERS = "1;2";
+	private static final String TEST_TERM_TOKEN_NUMBERS = "1;2;3;4;5";
 	
 	protected void setUp() throws Exception {
 		super.setUp();

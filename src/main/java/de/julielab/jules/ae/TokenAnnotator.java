@@ -104,10 +104,10 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		if (useCompleteDocText){			
 			LOGGER.debug("process() - tokenizing whole document text!");		
 			String text = aJCas.getDocumentText();	
-			String c = text.substring(text.length()-1);
-			//prevent that ')' and ']' as last character are treated as end-of-sentence symbols
-			if (c.equals(")") || c.equals("]"))
-				text += " ";
+//			//prevent that ')' and ']' as last character are treated as end-of-sentence symbols
+//			String c = text.substring(text.length()-1);
+//			if (c.equals(")") || c.equals("]"))
+//				text += " ";
 			tokenNumber = writeTokensToCAS(text, 0, aJCas, tokenNumber);
 		}	
 		// if useCompleteDocText is false, tokenize sentence per sentence
@@ -164,23 +164,11 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 					}
 					if (units.get(i).label.equals("N") ) {
 						startNewToken = false;
-						//last unit is expected to have label 'P' (otherwise this indicates an error in JTBD)
-						if ((i+1) == units.size()){
-							LOGGER.error("writeTokensToCAS() - last unit has label 'N', should have label 'P'");
-							throw new AnalysisEngineProcessException();
-						}
 					}
 					// write token when end of token (unit with label 'P') is reached
 					else if (units.get(i).label.equals("P")) { 
 						int end = unit.end + offset;
-						Token annotation = new Token(aJCas);
-						annotation.setBegin(begin);
-						annotation.setEnd(end);
-						annotation.setId("" + tokenNumber);
-						annotation.setComponentId("JULIE Token Boundary Detector");
-						annotation.addToIndexes();
-						LOGGER.debug("writeTokensToCAS() - created token: " + aJCas.getDocumentText().
-								substring(begin, end) + " " + begin + " - " + end);
+						createToken(aJCas, begin, end, tokenNumber);
 						startNewToken = true;
 						tokenNumber++;
 					}
@@ -190,44 +178,72 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 						throw new AnalysisEngineProcessException();
 					}
 				}
-				tokenNumber =  handleLastCharacter(aJCas, text, offset, tokenNumber);
+				//if last unit had label 'P' (should be the normal case) handle last character
+				if (startNewToken){
+					if (handleLastCharacter(aJCas, text, offset, tokenNumber)){
+						tokenNumber++;
+					}
+				}
+//				//this case (occurring when the last unit predicted for the input text has label 'N') should not happen, but
+				//it does, especially for input text that ends with a EOS symbol. Analysis of JTBD is pending. 
+				else {
+					int end = offset + text.length();
+					String terminalTextPart = (text.length() > 100) ? text.substring(text.length() - 100) : text;
+					LOGGER.warn("writeTokensToCAS() - found terminal unit with label 'N' (expected 'P'). Check behaviour of JTBD! " +
+							"End of input was: " + terminalTextPart);
+					//throw new AnalysisEngineProcessException();				
+					LOGGER.debug("writing pure 'N' token. Start: " + begin + ", end: " + end + 
+							" text: " + aJCas.getDocumentText().subSequence(begin, end));
+					
+					createToken(aJCas, begin, end, tokenNumber);
+					tokenNumber++;
+				}
+				
+//				//this case should not happen, but it does, especially for (analysis of JTBD still pending) 
+//				else {					
+//					LOGGER.info("writing pure 'N' token. Start: " + begin + ", end: " + (offset + text.length()));
+//					int end = offset + text.length();
+//					createToken(aJCas, begin, end, tokenNumber);
+//					tokenNumber++;
+//				}
 			}
 		}
 		return tokenNumber;
 	}
+	
+	private void createToken(JCas jcas, int begin, int end, int tokenNumber){
+		Token annotation = new Token(jcas);
+		annotation.setBegin(begin);
+		annotation.setEnd(end);
+		annotation.setId("" + tokenNumber);
+		annotation.setComponentId("JULIE Token Boundary Detector");
+		annotation.addToIndexes();
+		LOGGER.debug("createToken() - created token: " + jcas.getDocumentText().
+				substring(begin, end) + " " + begin + " - " + end);
+	}
 
 	/**
-	 * Write last character of a sentence as separate token (if it is a known end-of-sentence
-	 * symbol). 
+	 * Write last character of a sentence as separate token and return true if
+	 * it is a known end-of-sentence symbol. Otherwise return false.
 	 * 
 	 * @param aJCas
 	 *            The CAS that will contain the token.
 	 * @param text
 	 *            The current sentence text.
 	 */
-	private int handleLastCharacter(JCas aJCas, String text, int offset, int tokenNumber) {
-
+	private boolean handleLastCharacter(JCas aJCas, String text, int offset, int tokenNumber) {
 		EOSSymbols eosSymbols = new EOSSymbols();
-
 		if (text.length() > 1) {
-			String lastChar = text.substring(text.length() - 1, text.length());
-			
+			String lastChar = text.substring(text.length() - 1, text.length());			
 			if (eosSymbols.contains(lastChar)) {
 				// annotate it as separate token
 				int start = offset + text.length() - 1;
 				int end = offset + text.length();
-				Token annotation = new Token(aJCas);
-				annotation.setBegin(start);
-				annotation.setEnd(end);
-				annotation.setId("" + tokenNumber);
-				annotation.setComponentId(COMPONENT_ID);
-				annotation.addToIndexes();
-				tokenNumber++;
-				LOGGER.debug("handleLastCharacter() - created token: " + lastChar + 
-						" " + start + " - " + end);
+				createToken(aJCas, start, end, tokenNumber);
+				return true;
 			}
 		}
-		return tokenNumber;
+		return false;
 	}
 
 }
