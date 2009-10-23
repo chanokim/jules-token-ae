@@ -216,7 +216,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		annotation.setBegin(begin);
 		annotation.setEnd(end);
 		annotation.setId("" + tokenNumber);
-		annotation.setComponentId("JULIE Token Boundary Detector");
+		annotation.setComponentId(COMPONENT_ID);
 		annotation.addToIndexes();
 		LOGGER.debug("createToken() - created token: " + jcas.getDocumentText().
 				substring(begin, end) + " " + begin + " - " + end);
