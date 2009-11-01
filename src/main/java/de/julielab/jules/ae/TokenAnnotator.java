@@ -177,7 +177,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				//This case (last unit had label 'N') should not happen. Analysis of JTBD is pending. 
 				if (!startNewToken){
 					createToken(aJCas, begin, end);
-					LOGGER.warn("writeTokensToCAS() - found terminal unit with label 'N' (expected 'P'). Check behaviour of JTBD! Token text: " +
+					LOGGER.debug("writeTokensToCAS() - found terminal unit with label 'N' (expected 'P'). Check behaviour of JTBD! Token text: " +
 					aJCas.getDocumentText().subSequence(begin, end));
 					//throw new AnalysisEngineProcessException();	
 				}
