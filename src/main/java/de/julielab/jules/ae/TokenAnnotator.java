@@ -50,8 +50,12 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	private static final String USE_DOC_TEXT_PARAM = "UseDocText";
 
 	private Tokenizer tokenizer;
+		
+	private static boolean useCompleteDocText = false;
 	
-	boolean useCompleteDocText = false;
+	private static EOSSymbols eosSymbols = new EOSSymbols();
+
+	private int tokenNumber; //used as token ID
 
 	/**
 	 * Initialisiation of JTBD: load the model
@@ -65,10 +69,8 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		// invoke default initialization
 		super.initialize(aContext);
 
-		String modelFilename = "";
-
-		// get modelfilename from parameters
-		modelFilename = (String) aContext.getConfigParameterValue("ModelFilename");
+		// get model file name from parameters
+		String modelFilename = (String) aContext.getConfigParameterValue("ModelFilename");
 		
 		// define if sentence annotations should be taken into account		
 		Object useDocTextParam = aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);		
@@ -88,6 +90,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 			LOGGER.error("initialize() - Could not load tokenizer model: " + e.getMessage());
 			throw new ResourceInitializationException();
 		}
+
 	}
 
 	/**
@@ -97,29 +100,23 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		
 		LOGGER.debug("process() - starting processing document" );
 		
-		//count tokens (token number will be used as token id)
-		int tokenNumber = 1;
+		tokenNumber = 1;
 
 		// if useCompleteDocText is true, tokenize complete documentText
 		if (useCompleteDocText){			
 			LOGGER.debug("process() - tokenizing whole document text!");		
 			String text = aJCas.getDocumentText();	
-//			//prevent that ')' and ']' as last character are treated as end-of-sentence symbols
-//			String c = text.substring(text.length()-1);
-//			if (c.equals(")") || c.equals("]"))
-//				text += " ";
-			tokenNumber = writeTokensToCAS(text, 0, aJCas, tokenNumber);
+			writeTokensToCAS(text, 0, aJCas);
 		}	
 		// if useCompleteDocText is false, tokenize sentence per sentence
 		else {
 			JFSIndexRepository indexes = aJCas.getJFSIndexRepository();
 			Iterator sentenceIter = indexes.getAnnotationIndex(Sentence.type).iterator();
-			int sentOffset = 0;
 			while (sentenceIter.hasNext()) {
 				Sentence sentence = (Sentence) sentenceIter.next();					
 				LOGGER.debug("process() - going to next sentence having length: " + (sentence.getEnd() - sentence.getBegin()));
 				String text = sentence.getCoveredText();
-				tokenNumber = writeTokensToCAS(text, sentence.getBegin(), aJCas, tokenNumber);
+				writeTokensToCAS(text, sentence.getBegin(), aJCas);
 			}
 		}		
 	}
@@ -127,91 +124,76 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	/**
 	 * Tokenize non empty input and write tokens to CAS by interpreting the Unit objects. JTBD splits each sentence
 	 * into several units (see Tomanek et al. Medinfo 2007 paper) and decides for each such unit whether it is at the
-	 * end of a token or not (label "N" means: not at the end, "P": at the end). Makes an exta token for terminal end
+	 * end of a token or not (label "N" means: not at the end, "P": at the end). Makes an extra token for terminal end
 	 * of sentence symbols.
 	 * @param text
 	 * @param offset
 	 * @param aJCas
-	 * @param tokenNumber
 	 * @return
 	 * @throws AnalysisEngineProcessException
 	 */
-	private int writeTokensToCAS(String text, int offset, JCas aJCas, int tokenNumber) throws AnalysisEngineProcessException {	
+	private void writeTokensToCAS(String text, int offset, JCas aJCas) throws AnalysisEngineProcessException {	
 		
-		EOSSymbols eosSymbols = new EOSSymbols();
-		
-		//some debugging: skip empty input text
-		if (text == null)
-			LOGGER.debug("writeTokensToCAS() - input for JTBD tokenizer is null!"); 			
-		else if (text.isEmpty() || eosSymbols.contains(text)) 
-			LOGGER.debug("writeTokensToCAS() - input for JTBD is empty or is an end of sentence symbol");	
+		//skip empty input text
+		if (text == null || text.isEmpty()){
+			LOGGER.debug("writeTokensToCAS() - input for JTBD tokenizer is null or empty!"); 		
+		}
 		else {
-			LOGGER.debug("writeTokensToCAS() - tokenizing input: " + text);	
-			//predict units
-			ArrayList<Unit> units = tokenizer.predict(text);
-			// ignore text that has no predictions!
-			if (units == null || units.size() == 0)
-				LOGGER.warn("writeTokensToCAS() - no units found by JTBD for: " + text);
-			else {
-				int begin = 0;		
-				boolean startNewToken = true;		
+			//if input text is not a single EOS 
+			if (!eosSymbols.contains(text)) {	
+				LOGGER.debug("writeTokensToCAS() - tokenizing input: " + text);
+				
+				//predict units
+				ArrayList<Unit> units = tokenizer.predict(text);				
+				// throw error if no units could be predicted
+				if (units == null || units.size() == 0){
+					LOGGER.error("writeTokensToCAS() - no units found by JTBD for: " + text);
+					throw new AnalysisEngineProcessException();
+				}
+				
+				int begin = 0;
+				int end = 0;
+				boolean startNewToken = true;					
 				//iterate through units, write a token whenever a unit with label 'P' signals the end of a token
-				for (int i = 0; i < units.size(); i++) {
-					Unit unit = units.get(i);
-					//get start of the new token
+				//note that no unit exists for terminal EOS  in input text!
+				for (Unit unit : units) {					
 					if (startNewToken) { 
 						begin = unit.begin + offset;
 					}
-					if (units.get(i).label.equals("N") ) {
+					end = unit.end + offset;					
+					if (unit.label.equals("N") ) {
 						startNewToken = false;
 					}
-					// write token when end of token (unit with label 'P') is reached
-					else if (units.get(i).label.equals("P")) { 
-						int end = unit.end + offset;
-						createToken(aJCas, begin, end, tokenNumber);
+					// write token if 'end of token' (unit with label 'P') is reached
+					else if (unit.label.equals("P")) { 
+						createToken(aJCas, begin, end);
 						startNewToken = true;
-						tokenNumber++;
 					}
 					else {
-						LOGGER.error("writeTokensToCAS() - only 'N' and 'P' are allowed as unit labels, " +
-								"but found '" + units.get(i).label);
+						LOGGER.error("writeTokensToCAS() - found unit label '" + unit.label + "' (only 'N' and 'P' are allowed");
 						throw new AnalysisEngineProcessException();
 					}
 				}
-				//if last unit had label 'P' (should be the normal case) handle last character
-				if (startNewToken){
-					if (handleLastCharacter(aJCas, text, offset, tokenNumber)){
-						tokenNumber++;
-					}
+				//This case (last unit had label 'N') should not happen. Analysis of JTBD is pending. 
+				if (!startNewToken){
+					createToken(aJCas, begin, end);
+					LOGGER.warn("writeTokensToCAS() - found terminal unit with label 'N' (expected 'P'). Check behaviour of JTBD! Token text: " +
+					aJCas.getDocumentText().subSequence(begin, end));
+					//throw new AnalysisEngineProcessException();	
 				}
-//				//this case (occurring when the last unit predicted for the input text has label 'N') should not happen, but
-				//it does, especially for input text that ends with a EOS symbol. Analysis of JTBD is pending. 
-				else {
-					int end = offset + text.length();
-					String terminalTextPart = (text.length() > 100) ? text.substring(text.length() - 100) : text;
-					LOGGER.warn("writeTokensToCAS() - found terminal unit with label 'N' (expected 'P'). Check behaviour of JTBD! " +
-							"End of input was: " + terminalTextPart);
-					//throw new AnalysisEngineProcessException();				
-					LOGGER.debug("writing pure 'N' token. Start: " + begin + ", end: " + end + 
-							" text: " + aJCas.getDocumentText().subSequence(begin, end));
-					
-					createToken(aJCas, begin, end, tokenNumber);
-					tokenNumber++;
-				}
-				
-//				//this case should not happen, but it does, especially for (analysis of JTBD still pending) 
-//				else {					
-//					LOGGER.info("writing pure 'N' token. Start: " + begin + ", end: " + (offset + text.length()));
-//					int end = offset + text.length();
-//					createToken(aJCas, begin, end, tokenNumber);
-//					tokenNumber++;
-//				}
+			}
+			//if last character of a sentence is a EOS, make it a separate token 
+			String lastChar = text.substring(text.length() - 1, text.length());	
+			if (eosSymbols.contains(lastChar)) {
+				int start = offset + text.length() - 1;
+				int end = offset + text.length();
+				createToken(aJCas, start, end);
 			}
 		}
-		return tokenNumber;
+
 	}
 	
-	private void createToken(JCas jcas, int begin, int end, int tokenNumber){
+	private void createToken(JCas jcas, int begin, int end){
 		Token annotation = new Token(jcas);
 		annotation.setBegin(begin);
 		annotation.setEnd(end);
@@ -220,30 +202,8 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		annotation.addToIndexes();
 		LOGGER.debug("createToken() - created token: " + jcas.getDocumentText().
 				substring(begin, end) + " " + begin + " - " + end);
+		tokenNumber++;
 	}
 
-	/**
-	 * Write last character of a sentence as separate token and return true if
-	 * it is a known end-of-sentence symbol. Otherwise return false.
-	 * 
-	 * @param aJCas
-	 *            The CAS that will contain the token.
-	 * @param text
-	 *            The current sentence text.
-	 */
-	private boolean handleLastCharacter(JCas aJCas, String text, int offset, int tokenNumber) {
-		EOSSymbols eosSymbols = new EOSSymbols();
-		if (text.length() > 1) {
-			String lastChar = text.substring(text.length() - 1, text.length());			
-			if (eosSymbols.contains(lastChar)) {
-				// annotate it as separate token
-				int start = offset + text.length() - 1;
-				int end = offset + text.length();
-				createToken(aJCas, start, end, tokenNumber);
-				return true;
-			}
-		}
-		return false;
-	}
 
 }
