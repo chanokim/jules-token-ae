@@ -7,7 +7,7 @@
   <groupId>de.julielab</groupId>
   <artifactId>jules-token-ae</artifactId>
   <packaging>jar</packaging>
-  <version>2.3.0</version>
+  <version>2.4</version>
   <description>UIMA Wrapper for JULIE Token Boundary Detector</description>
 
   <parent>
@@ -29,5 +29,34 @@
 	    <artifactId>log4j</artifactId>
 	    <version>1.2.14</version>
 	</dependency>
+	
+	 		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
   </dependencies>
+  
+  
+    <!-- UNCOMMENT THIS PART IF YOU WANT TO CREATE A JAR PACKAGE FOR JSBD
+  BEFORE RUNNING THE SCRIPT makeJSBDtgz.sh  -->
+  
+  <!--
+   <build>
+    <plugins>
+         <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+                <finalName>JTBD-2.4</finalName> 
+                <excludes>
+                      <exclude>de/julielab/jules/**/*.class</exclude>
+                </excludes>    
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+ -->
+  
 </project>
