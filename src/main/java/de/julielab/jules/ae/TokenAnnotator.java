@@ -144,7 +144,10 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				LOGGER.debug("writeTokensToCAS() - tokenizing input: " + text);
 				
 				//predict units
-				ArrayList<Unit> units = tokenizer.predict(text);				
+				ArrayList<Unit> units = tokenizer.predict(text);	
+				
+				LOGGER.debug("+++predition done!++++");
+				
 				// throw error if no units could be predicted
 				if (units == null || units.size() == 0){
 					LOGGER.error("writeTokensToCAS() - no units found by JTBD for: " + text);
