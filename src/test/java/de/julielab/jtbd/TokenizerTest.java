@@ -40,7 +40,7 @@ public class TokenizerTest {
 
 	private static final Logger LOGGER = Logger.getLogger(TokenizerTest.class);
 
-	private static final String FILENAME_MODEL = "src/test/resources/JTBD-2.0-biomed.mod.gz";
+	private static final String FILENAME_MODEL = "src/test/resources/models/JTBD-2.0-biomed.mod.gz";
 	private static final String FILENAME_TRAIN_DATA_ORG = "src/test/resources/testdata/train/train.sent";
 	private static final String FILENAME_TRAIN_DATA_TOK = "src/test/resources/testdata/train/train.tok";
 	private static final String FILENAME_TRAIN_MODEL_OUTPUT = "/tmp/TestModelOuput.mod";
