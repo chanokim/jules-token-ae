@@ -120,7 +120,6 @@ public class Tokenizer {
 	 * @return
 	 */
 	public Instance makePredictionData(StringBuffer orgSentence, StringBuffer tokSentence) {
-
 		// remove last character of orgSentence if this is an EOS-symbol
 		EOSSymbols E = new EOSSymbols();
 
@@ -136,9 +135,16 @@ public class Tokenizer {
 			if (E.contains(lastChar))
 				orgSentence.deleteCharAt(orgSentence.length() - 1);
 		}
-
-		Instance inst = model.getInputPipe().instanceFrom(
-						new Instance(orgSentence.toString(), null, null, tokSentence.toString()));
+		Instance inst = null;
+		//Logging level 'Trace' is used that is unknown to log4j versions older than 1.2.12.
+		try {
+			inst = model.getInputPipe().instanceFrom(
+					new Instance(orgSentence.toString(), null, null, tokSentence.toString()));
+		}
+		catch (NoSuchMethodError e){
+			e.printStackTrace();
+			System.exit(0);
+		}
 		return inst;
 	}
 
@@ -224,7 +230,7 @@ public class Tokenizer {
 		if (units.size() > 0) {
 			// get sequence
 			Sequence input = (Sequence) inst.getData();
-			
+
 			// transduce and generate output
 			Sequence crfOutput = model.transduce(input);
 			for (int j = 0; j < crfOutput.size(); j++) {
