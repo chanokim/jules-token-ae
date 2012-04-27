@@ -91,11 +91,11 @@ public class Tokenizer {
 			// remove last character of orgSentence if this is an EOS-symbol
 			EOSSymbols E = new EOSSymbols();
 
-			String lastChar = tokSentence.substring(tokSentence.length() - 1, tokSentence.length());
+			Character lastChar = tokSentence.charAt(tokSentence.length() - 1);
 			if (E.contains(lastChar))
 				tokSentence.deleteCharAt(tokSentence.length() - 1);
 
-			lastChar = orgSentence.substring(orgSentence.length() - 1, orgSentence.length());
+			lastChar = orgSentence.charAt(orgSentence.length() - 1);
 			if (E.contains(lastChar))
 				orgSentence.deleteCharAt(orgSentence.length() - 1);
 
@@ -115,23 +115,21 @@ public class Tokenizer {
 	 *            the original sentence
 	 * @param tokSentence
 	 *            empty string may be provided
-	 * @param P
-	 *            the pipe used for training
 	 * @return
 	 */
 	public Instance makePredictionData(StringBuffer orgSentence, StringBuffer tokSentence) {
 		// remove last character of orgSentence if this is an EOS-symbol
 		EOSSymbols E = new EOSSymbols();
 
-		String lastChar = "";
+		Character lastChar = null;
 		if (tokSentence.length() > 0) {
-			lastChar = tokSentence.substring(tokSentence.length() - 1, tokSentence.length());
+			lastChar = tokSentence.charAt(tokSentence.length() - 1);
 			if (E.contains(lastChar))
 				tokSentence.deleteCharAt(tokSentence.length() - 1);
 		}
 
 		if (orgSentence.length() > 0) {
-			lastChar = orgSentence.substring(orgSentence.length() - 1, orgSentence.length());
+			lastChar = orgSentence.charAt(orgSentence.length() - 1);
 			if (E.contains(lastChar))
 				orgSentence.deleteCharAt(orgSentence.length() - 1);
 		}

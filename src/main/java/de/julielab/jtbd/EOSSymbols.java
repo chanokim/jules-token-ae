@@ -17,34 +17,34 @@
 
 package de.julielab.jtbd;
 
-import java.util.TreeSet;
+import java.util.HashSet;
 
 public class EOSSymbols {
 
-	TreeSet<String> symbols;
+	HashSet<Character> symbols;
 
 	public EOSSymbols() {
 		init();
 	}
 
 	private void init() {
-		symbols = new TreeSet<String>();
-		symbols.add(".");
-		symbols.add(":");
-		symbols.add("!");
-		symbols.add("?");
-		symbols.add("]");
-		symbols.add(")");
-		symbols.add("\"");
+		symbols = new HashSet<Character>();
+		symbols.add('.');
+		symbols.add(':');
+		symbols.add('!');
+		symbols.add('?');
+		symbols.add(']');
+		symbols.add(')');
+		symbols.add('"');
 	}
 	
-	public boolean contains(String c) {
+	public boolean contains(Character c) {
 		return symbols.contains(c);
 	}
 	
 	public boolean tokenEndsWithEOSSymbol(String token) {
 		if (token.length()>0) {
-			String lastChar = token.substring(token.length() - 1, token.length());
+			Character lastChar = token.charAt(token.length() - 1);
 			if (symbols.contains(lastChar))
 				return true;
 		} 

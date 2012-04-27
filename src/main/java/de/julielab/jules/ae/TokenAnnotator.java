@@ -24,13 +24,15 @@ package de.julielab.jules.ae;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.JFSIndexRepository;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.uimafit.descriptor.ConfigurationParameter;
 
 import de.julielab.jtbd.EOSSymbols;
 import de.julielab.jtbd.Tokenizer;
@@ -43,8 +45,10 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	/**
 	 * Logger for this class
 	 */
-	private static final Logger LOGGER = Logger.getLogger(TokenAnnotator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TokenAnnotator.class);
 
+	public static final String PARAM_MODEL = "ModelFilename";
+	
 	private static final String COMPONENT_ID = "JULIE Token Boundary Detector";
 	
 	private static final String USE_DOC_TEXT_PARAM = "UseDocText";
@@ -56,6 +60,9 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 	private static EOSSymbols eosSymbols = new EOSSymbols();
 
 	private int tokenNumber; //used as token ID
+
+	@ConfigurationParameter(name=PARAM_MODEL,mandatory=true,description="Path to the tokenizer model.")
+	private String modelFilename;
 
 	/**
 	 * Initialisiation of JTBD: load the model
@@ -70,7 +77,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		super.initialize(aContext);
 
 		// get model file name from parameters
-		String modelFilename = (String) aContext.getConfigParameterValue("ModelFilename");
+		modelFilename = (String) aContext.getConfigParameterValue(PARAM_MODEL);
 		
 		// define if sentence annotations should be taken into account		
 		Object useDocTextParam = aContext.getConfigParameterValue(USE_DOC_TEXT_PARAM);		
@@ -140,7 +147,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 		}
 		else {
 			//if input text is not a single EOS 
-			if (!eosSymbols.contains(text)) {	
+			if (text.length() > 1 || !eosSymbols.contains(text.charAt(text.length() - 1))) {	
 				LOGGER.debug("writeTokensToCAS() - tokenizing input: " + text);
 				
 				//predict units
@@ -186,7 +193,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				}
 			}
 			//if last character of a sentence is a EOS, make it a separate token 
-			String lastChar = text.substring(text.length() - 1, text.length());	
+			Character lastChar = text.charAt(text.length() - 1);	
 			if (eosSymbols.contains(lastChar)) {
 				int start = offset + text.length() - 1;
 				int end = offset + text.length();
