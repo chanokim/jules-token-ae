@@ -24,7 +24,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Alphabet;
@@ -34,13 +35,11 @@ import cc.mallet.types.LabelSequence;
 import cc.mallet.types.Token;
 import cc.mallet.types.TokenSequence;
 
-import de.julielab.jtbd.Unit;
-
 class Sentence2TokenPipe extends Pipe {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger LOGGER = Logger
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(Sentence2TokenPipe.class);
 
 	// all upper case letters (consider different languages, too)

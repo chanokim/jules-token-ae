@@ -19,28 +19,27 @@ package de.julielab.jules.ae;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import junit.framework.TestCase;
 
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
-import org.apache.uima.jcas.JFSIndexRepository;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.JFSIndexRepository;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceSpecifier;
 import org.apache.uima.util.XMLInputSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.julielab.jules.types.Sentence;
 import de.julielab.jules.types.Token;
-
-import junit.framework.TestCase;
 
 public class TokenAnnotatorTest extends TestCase {
 
 	/**
 	 * Logger for this class
 	 */
-	private static final Logger LOGGER = Logger
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(TokenAnnotatorTest.class);
 
 	private static final String DESCRIPTOR = "src/test/resources/TokenAnnotatorTest.xml";
@@ -59,10 +58,6 @@ public class TokenAnnotatorTest extends TestCase {
 	private static final String TEST_SENTENCES_TOKEN_NUMBERS = "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17";
 	private static final String TEST_TERM_TOKEN_NUMBERS = "1;2;3;4;5";
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		PropertyConfigurator.configure("src/test/resources/log4j.properties");
-	}
 
 	/**
 	 * initialize a CAS which is then used for the test. 2 sentences are added

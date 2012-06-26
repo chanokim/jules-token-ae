@@ -19,22 +19,16 @@ package de.julielab.jtbd;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import junit.framework.TestCase;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Sentence2TokenPipeTest extends TestCase{
 
-	private static final Logger LOGGER = Logger.getLogger(Sentence2TokenPipeTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Sentence2TokenPipeTest.class);
 	
 	private static final String TEST_SENTENCE = "this is   a \t junit -test";
-	
-	protected void setUp() throws Exception {
-		super.setUp();
-		// set log4j properties file
-		PropertyConfigurator.configure("src/test/resources/log4j.properties");
-	}
 	
 	public void testMakeLabel() {
 		ArrayList<String> expectedLabels = new ArrayList<String>();

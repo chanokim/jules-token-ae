@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.mallet.fst.CRF;
 import cc.mallet.fst.CRFTrainerByLabelLikelihood;
@@ -46,7 +47,7 @@ import cc.mallet.types.Sequence;
 
 public class Tokenizer {
 
-	private static final Logger LOGGER = Logger.getLogger(Tokenizer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Tokenizer.class);
 
 	CRF model = null;
 
