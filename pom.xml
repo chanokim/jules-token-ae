@@ -1,73 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>jules-token-ae</artifactId>
-  <packaging>jar</packaging>
-  <version>2.4.2-SNAPSHOT</version>
-  <description>UIMA Wrapper for JULIE Token Boundary Detector</description>
 
-  <parent>
-	<groupId>de.julielab</groupId>
-	<artifactId>jules</artifactId>
-	<version>1.7-SNAPSHOT</version>
-  </parent>	
-	 
-  <dependencies>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jules-token-ae</artifactId>
+	<packaging>jar</packaging>
+	<version>2.4.3-SNAPSHOT</version>
+	<description>UIMA Wrapper for JULIE Token Boundary Detector</description>
 
-    <dependency>
+	<parent>
 		<groupId>de.julielab</groupId>
-		<artifactId>jules-mallet-2</artifactId>
-		<version>1.1-SNAPSHOT</version>
-	</dependency>
+		<artifactId>jules-pears</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
 
-	
-	 		<dependency>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.uima</groupId>
+				<artifactId>PearPackagingMavenPlugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>de.julielab</groupId>
+			<artifactId>jules-mallet-2</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+
+
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
 			<scope>test</scope>
 		</dependency>
-	 		<dependency>
-	 			<groupId>de.julielab</groupId>
-	 			<artifactId>jules-types</artifactId>
-	 			<version>2.10.7-SNAPSHOT</version>
-	 			<scope>test</scope>
-	 		</dependency>
-	 		<dependency>
-	 			<groupId>ch.qos.logback</groupId>
-	 			<artifactId>logback-classic</artifactId>
-	 			<version>1.0.2</version>
-	 			<scope>test</scope>
-	 		</dependency>
-	 		<dependency>
-	 			<groupId>org.slf4j</groupId>
-	 			<artifactId>slf4j-api</artifactId>
-	 			<version>1.6.4</version>
-	 		</dependency>
-  </dependencies>
-  
-  
-    <!-- UNCOMMENT THIS PART IF YOU WANT TO CREATE A JAR PACKAGE FOR JSBD
-  BEFORE RUNNING THE SCRIPT makeJSBDtgz.sh  -->
-  
-<!--	
-   <build>
-    <plugins>
-         <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-                <finalName>JTBD-2.4</finalName> 
-                <excludes>
-                      <exclude>de/julielab/jules/**/*.class</exclude>
-                </excludes>    
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
--->
-  
+		<dependency>
+			<groupId>de.julielab</groupId>
+			<artifactId>jules-types</artifactId>
+			<version>2.10.7-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+	</dependencies>
+
+
+	<!-- UNCOMMENT THIS PART IF YOU WANT TO CREATE A JAR PACKAGE FOR JSBD BEFORE 
+		RUNNING THE SCRIPT makeJSBDtgz.sh -->
+
+	<!-- <build> <plugins> <plugin> <groupId>org.apache.maven.plugins</groupId> 
+		<artifactId>maven-jar-plugin</artifactId> <configuration> <finalName>JTBD-2.4</finalName> 
+		<excludes> <exclude>de/julielab/jules/**/*.class</exclude> </excludes> </configuration> 
+		</plugin> </plugins> </build> -->
+
 </project>
