@@ -20,7 +20,7 @@
 package de.julielab.jtbd;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,7 +48,7 @@ class Sentence2TokenPipe extends Pipe {
 	// all lower case letters (consider different languages, too)
 	static final String LOW = "a-zàèìòùáéíóúçñïäöü";
 
-	TreeSet<String> tbSymbols;
+	Set<String> tbSymbols;
 
 	Pattern splitPattern = Pattern.compile("[^\\s]+");
 
@@ -56,7 +56,7 @@ class Sentence2TokenPipe extends Pipe {
 	 * default constructor
 	 */
 	public Sentence2TokenPipe() {
-		super (new Alphabet(), new LabelAlphabet());
+		super(new Alphabet(), new LabelAlphabet());
 		tbSymbols = (new TokenBoundarySymbols()).getSymbols();
 	}
 
@@ -82,7 +82,8 @@ class Sentence2TokenPipe extends Pipe {
 		TokenSequence data = new TokenSequence();
 
 		// the labels (P,N), P (positive) = end of token
-		LabelSequence target = new LabelSequence((LabelAlphabet) getTargetAlphabet());
+		LabelSequence target = new LabelSequence(
+				(LabelAlphabet) getTargetAlphabet());
 
 		ArrayList<Unit> units = new ArrayList<Unit>();
 		ArrayList<String> wSpaces = new ArrayList<String>();
@@ -103,12 +104,16 @@ class Sentence2TokenPipe extends Pipe {
 
 		// check integrity !
 		if (units.size() != labels.size() || labels.size() != wSpaces.size()) {
-			int pos = ((Integer) carrier.getName()).intValue() + 1;
-			LOGGER
-					.error("pipe() - Unit and label extraction produced failure (at position "
-							+ pos
-							+ "). Omitting sentences for feature generation...\n"
-							+ orgSentence + "\n" + tokSentence);
+			int pos = -1;
+			if (null != carrier.getName())
+				pos = ((Integer) carrier.getName()).intValue() + 1;
+			LOGGER.error(
+					"Something's wrong with unit creation. Number of units: {}; number of labels: {}; number of whitespaces: {}",
+					new Object[] { units.size(), labels.size(), wSpaces.size() });
+			LOGGER.error("pipe() - Unit and label extraction produced failure (at position "
+					+ (pos == -1 ? "unknown" : pos)
+					+ "). Omitting sentences for feature generation...\n"
+					+ orgSentence + "\n" + tokSentence);
 
 			// just omit this sentence for tokenization, but throw the error
 			// from above
@@ -475,9 +480,9 @@ class Sentence2TokenPipe extends Pipe {
 
 	}
 
-	
 	/**
 	 * make the label sequence for the corresponding unit sequence
+	 * 
 	 * @param orgSentence
 	 * @param units
 	 *            the single units of a sentence (w/o white space)

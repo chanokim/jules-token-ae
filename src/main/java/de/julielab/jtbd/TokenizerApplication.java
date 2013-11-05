@@ -33,6 +33,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.zip.GZIPInputStream;
 
 import cc.mallet.fst.CRF;
 import cc.mallet.pipe.Pipe;
@@ -94,7 +95,7 @@ public class TokenizerApplication {
 		CRF crf = null;
 		try {
 			// load model
-			in = new ObjectInputStream(new FileInputStream(args[1]));
+			in = new ObjectInputStream(new GZIPInputStream(new FileInputStream(args[1])));
 			crf = (CRF) in.readObject();
 			in.close();
 		} catch (Exception e) {
@@ -312,8 +313,9 @@ public class TokenizerApplication {
 				+ sizeLastRound);
 		System.out.println();
 
-		double[] acc = new double[n]; // 
+		EvalResult[] er = new EvalResult[n]; //
 		double avgAcc = 0;
+		double avgF = 0;
 
 		for (int i = 0; i < n; i++) { // in each round
 
@@ -360,20 +362,24 @@ public class TokenizerApplication {
 			System.out.println("training size: " + trainOrgSentences.size());
 			System.out
 					.println("prediction size: " + predictOrgSentences.size());
-			acc[i] = doEvaluation(trainOrgSentences, trainTokSentences,
+			er[i] = doEvaluation(trainOrgSentences, trainTokSentences,
 					predictOrgSentences, predictTokSentences, predictions,
 					errors);
 		}
 
 		DecimalFormat df = new DecimalFormat("0.000");
-		for (int i = 0; i < acc.length; i++) {
-			avgAcc += acc[i];
-			System.out.println("ACC in round " + i + ": " + df.format(acc[i]));
+		for (int i = 0; i < er.length; i++) {
+			avgAcc += er[i].ACC;
+			avgF += er[i].getF();
+			System.out.println("ACC in round " + i + ": "
+					+ df.format(er[i].ACC));
 		}
 		avgAcc = avgAcc / (double) n;
+		avgF = avgF / (double) n;
 
 		System.out.println("\n\n------------------------------------");
 		System.out.println("avg accuracy: " + df.format(avgAcc));
+		System.out.println("avg F-score: " + df.format(avgF));
 		System.out.println("------------------------------------");
 		return avgAcc;
 
@@ -388,13 +394,12 @@ public class TokenizerApplication {
 	 * @param predictions
 	 * @return
 	 */
-	private static double do9010Evaluation(File orgSentencesFile,
+	private static EvalResult do9010Evaluation(File orgSentencesFile,
 			File tokSentencesFile, ArrayList<String> errors,
 			ArrayList<String> predictions) {
 
 		ArrayList<String> orgSentences = readFile(orgSentencesFile);
 		ArrayList<String> tokSentences = readFile(tokSentencesFile);
-
 
 		long seed = 1;
 		Collections.shuffle(orgSentences, new Random(seed));
@@ -447,7 +452,7 @@ public class TokenizerApplication {
 	 * @param predictions
 	 * @return
 	 */
-	private static double doEvaluation(CRF crf,
+	private static EvalResult doEvaluation(CRF crf,
 			ArrayList<String> predictOrgSentences,
 			ArrayList<String> predictTokSentences, ArrayList<String> errors,
 			ArrayList<String> predictions) {
@@ -467,8 +472,8 @@ public class TokenizerApplication {
 		for (int i = 0; i < predData.size(); i++) {
 			String orgSentence = predictOrgSentences.get(i);
 			String tokSentence = predictTokSentences.get(i);
-			String sentenceBoundary = orgSentence.substring(orgSentence
-					.length() - 1, orgSentence.length());
+			String sentenceBoundary = orgSentence.substring(
+					orgSentence.length() - 1, orgSentence.length());
 
 			Instance inst = (Instance) predData.get(i);
 			ArrayList<Unit> units = null;
@@ -478,6 +483,7 @@ public class TokenizerApplication {
 			ArrayList<String> orgLabels = tokenizer
 					.getLabelsFromLabelSequence((LabelSequence) inst
 							.getTarget());
+
 			ArrayList<String> wSpaces = (ArrayList) inst.getSource();
 
 			String sentence = "";
@@ -541,15 +547,25 @@ public class TokenizerApplication {
 		}
 
 		double ACC = (corrDecisions / (double) nrDecisions);
+		EvalResult er = new EvalResult();
+		er.ACC = ACC;
+		er.fn = fn;
+		er.fp = fp;
+		er.corrDecisions = corrDecisions;
+		er.nrDecisions = nrDecisions;
 		System.out.println("\n* ------------------------------------");
 		System.out.println("* critical decisions: " + nrDecisions);
 		System.out.println("* correct decisions: " + corrDecisions);
 		System.out.println("* fp: " + fp);
 		System.out.println("* fn: " + fn);
+		System.out.println("* R: " + er.getR());
+		System.out.println("* P: " + er.getP());
+		System.out.println("* F: " + er.getF());
 		System.out.println("* ACC = " + ACC);
 		System.out.println("* ------------------------------------\n");
 
-		return ACC;
+		// return ACC;
+		return er;
 
 	}
 
@@ -565,7 +581,7 @@ public class TokenizerApplication {
 	 * @param predictions
 	 * @return
 	 */
-	public static double doEvaluation(ArrayList<String> trainOrgSentences,
+	public static EvalResult doEvaluation(ArrayList<String> trainOrgSentences,
 			ArrayList<String> trainTokSentences,
 			ArrayList<String> predictOrgSentences,
 			ArrayList<String> predictTokSentences, ArrayList<String> errors,
@@ -597,13 +613,12 @@ public class TokenizerApplication {
 		for (int i = 0; i < predData.size(); i++) {
 			String orgSentence = predictOrgSentences.get(i);
 			String tokSentence = predictTokSentences.get(i);
-			String sentenceBoundary = orgSentence.substring(orgSentence
-					.length() - 1, orgSentence.length());
+			String sentenceBoundary = orgSentence.substring(
+					orgSentence.length() - 1, orgSentence.length());
 
 			Instance inst = (Instance) predData.get(i);
 			ArrayList<Unit> units = null;
 			units = tokenizer.predict(inst);
-			
 
 			// 3. evaluation
 			ArrayList<String> orgLabels = tokenizer
@@ -673,15 +688,25 @@ public class TokenizerApplication {
 		}
 
 		double ACC = (corrDecisions / (double) nrDecisions);
+		EvalResult er = new EvalResult();
+		er.ACC = ACC;
+		er.fn = fn;
+		er.fp = fp;
+		er.corrDecisions = corrDecisions;
+		er.nrDecisions = nrDecisions;
 		System.out.println("\n* ------------------------------------");
 		System.out.println("* critical decisions: " + nrDecisions);
 		System.out.println("* correct decisions: " + corrDecisions);
 		System.out.println("* fp: " + fp);
 		System.out.println("* fn: " + fn);
+		System.out.println("* R: " + er.getR());
+		System.out.println("* P: " + er.getP());
+		System.out.println("* F: " + er.getF());
 		System.out.println("* ACC = " + ACC);
 		System.out.println("* ------------------------------------\n");
 
-		return ACC;
+		// return ACC;
+		return er;
 
 	}
 
@@ -757,8 +782,8 @@ public class TokenizerApplication {
 			// predict
 			for (int i = 0; i < predData.size(); i++) {
 				String orgSentence = orgSentences.get(i);
-				String sentenceBoundary = orgSentence.substring(orgSentence
-						.length() - 1, orgSentence.length());
+				String sentenceBoundary = orgSentence.substring(
+						orgSentence.length() - 1, orgSentence.length());
 
 				Instance inst = (Instance) predData.get(i);
 				ArrayList<Unit> units = null;
@@ -786,8 +811,8 @@ public class TokenizerApplication {
 
 			// write predictions into file
 			String fName = predictOrgFiles[f].toString();
-			String newfName = fName.substring(fName.lastIndexOf("/") + 1, fName
-					.length());
+			String newfName = fName.substring(fName.lastIndexOf("/") + 1,
+					fName.length());
 			File fNew = new File(outDir.toString() + "/" + newfName);
 			writeFile(predictions, fNew);
 			// System.out.println("\ntokenized sentences written to: " +
@@ -868,4 +893,23 @@ public class TokenizerApplication {
 
 	}
 
+	private static class EvalResult {
+		int nrDecisions;
+		double ACC;
+		double fp;
+		double fn;
+		double corrDecisions;
+
+		double getF() {
+			return 2 * getR() * getP() / (getR() + getP());
+		}
+
+		double getR() {
+			return (double) corrDecisions / (corrDecisions + fn);
+		}
+
+		double getP() {
+			return (double) corrDecisions / (corrDecisions + fp);
+		}
+	}
 }

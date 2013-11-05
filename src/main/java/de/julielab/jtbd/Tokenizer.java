@@ -47,7 +47,8 @@ import cc.mallet.types.Sequence;
 
 public class Tokenizer {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Tokenizer.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(Tokenizer.class);
 
 	CRF model = null;
 
@@ -68,7 +69,8 @@ public class Tokenizer {
 	 *            a tokenized sentence
 	 * @return
 	 */
-	public InstanceList makeTrainingData(ArrayList<String> orgSentences, ArrayList<String> tokSentences) {
+	public InstanceList makeTrainingData(ArrayList<String> orgSentences,
+			ArrayList<String> tokSentences) {
 
 		LOGGER.debug("makeTrainingData() - making training data...");
 
@@ -86,8 +88,10 @@ public class Tokenizer {
 		for (int i = 0; i < orgSentences.size(); i++) {
 
 			// remove leading and trailing ws
-			StringBuffer orgSentence = new StringBuffer(orgSentences.get(i).trim());
-			StringBuffer tokSentence = new StringBuffer(tokSentences.get(i).trim());
+			StringBuffer orgSentence = new StringBuffer(orgSentences.get(i)
+					.trim());
+			StringBuffer tokSentence = new StringBuffer(tokSentences.get(i)
+					.trim());
 
 			// remove last character of orgSentence if this is an EOS-symbol
 			EOSSymbols E = new EOSSymbols();
@@ -101,10 +105,12 @@ public class Tokenizer {
 				orgSentence.deleteCharAt(orgSentence.length() - 1);
 
 			// make instance
-			instList.addThruPipe(new Instance(orgSentence.toString(), "", new Integer(i), tokSentence.toString()));
+			instList.addThruPipe(new Instance(orgSentence.toString(), "",
+					new Integer(i), tokSentence.toString()));
 		}
 
-		LOGGER.debug("makeTrainingData() -  number of features on training data: " + myPipe.getDataAlphabet().size());
+		LOGGER.debug("makeTrainingData() -  number of features on training data: "
+				+ myPipe.getDataAlphabet().size());
 
 		return instList;
 	}
@@ -118,7 +124,8 @@ public class Tokenizer {
 	 *            empty string may be provided
 	 * @return
 	 */
-	public Instance makePredictionData(StringBuffer orgSentence, StringBuffer tokSentence) {
+	public Instance makePredictionData(StringBuffer orgSentence,
+			StringBuffer tokSentence) {
 		// remove last character of orgSentence if this is an EOS-symbol
 		EOSSymbols E = new EOSSymbols();
 
@@ -135,12 +142,13 @@ public class Tokenizer {
 				orgSentence.deleteCharAt(orgSentence.length() - 1);
 		}
 		Instance inst = null;
-		//Logging level 'Trace' is used that is unknown to log4j versions older than 1.2.12.
+		// Logging level 'Trace' is used that is unknown to log4j versions older
+		// than 1.2.12.
 		try {
 			inst = model.getInputPipe().instanceFrom(
-					new Instance(orgSentence.toString(), null, null, tokSentence.toString()));
-		}
-		catch (NoSuchMethodError e){
+					new Instance(orgSentence.toString(), null, null,
+							tokSentence.toString()));
+		} catch (NoSuchMethodError e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
@@ -150,7 +158,8 @@ public class Tokenizer {
 	/**
 	 * make material for prediction from a collection of sentences
 	 */
-	public InstanceList makePredictionData(ArrayList<String> orgSentences, ArrayList<String> tokSentences) {
+	public InstanceList makePredictionData(ArrayList<String> orgSentences,
+			ArrayList<String> tokSentences) {
 
 		LOGGER.debug("makePredictionData() - making prediction data");
 
@@ -160,7 +169,11 @@ public class Tokenizer {
 			StringBuffer tokSentence = new StringBuffer(tokSentences.get(i));
 
 			Instance inst = makePredictionData(orgSentence, tokSentence);
-			predictData.add(inst);
+			// As of now, we should have an array of whitespace information. If
+			// we still have a string, there was a problem converting the
+			// sentence to units.
+			if (!(inst.getSource() instanceof String))
+				predictData.add(inst);
 		}
 		return predictData;
 	}
@@ -179,7 +192,8 @@ public class Tokenizer {
 		model.addStatesForLabelsConnectedAsIn(instList);
 
 		// get trainer
-		CRFTrainerByLabelLikelihood crfTrainer = new CRFTrainerByLabelLikelihood(model);
+		CRFTrainerByLabelLikelihood crfTrainer = new CRFTrainerByLabelLikelihood(
+				model);
 
 		// do the training with unlimited amount of iterations
 		boolean b = crfTrainer.trainOptimized(instList);
@@ -204,11 +218,13 @@ public class Tokenizer {
 	public ArrayList<Unit> predict(String sentence) {
 		LOGGER.debug("predict() - before pedicting labelss ...");
 		if (trained == false || model == null) {
-			throw new IllegalStateException("No model available. Train or load trained model first.");
+			throw new IllegalStateException(
+					"No model available. Train or load trained model first.");
 		}
 		LOGGER.debug("predict() - now making pedictions ...");
-		Instance inst = makePredictionData(new StringBuffer(sentence), new StringBuffer(""));
-		LOGGER.debug("predict() - after pedicting labels ...");		
+		Instance inst = makePredictionData(new StringBuffer(sentence),
+				new StringBuffer(""));
+		LOGGER.debug("predict() - after pedicting labels ...");
 		return predict(inst);
 	}
 
@@ -222,7 +238,8 @@ public class Tokenizer {
 	public ArrayList<Unit> predict(Instance inst) {
 
 		if (trained == false || model == null) {
-			throw new IllegalStateException("No model available. Train or load trained model first.");
+			throw new IllegalStateException(
+					"No model available. Train or load trained model first.");
 		}
 
 		ArrayList<Unit> units = (ArrayList<Unit>) inst.getName();
@@ -260,7 +277,8 @@ public class Tokenizer {
 	 * @param orgLabels
 	 * @return
 	 */
-	public String showErrorContext(int i, ArrayList<Unit> units, ArrayList<String> orgLabels) {
+	public String showErrorContext(int i, ArrayList<Unit> units,
+			ArrayList<String> orgLabels) {
 
 		final int c = 2;
 
@@ -279,17 +297,20 @@ public class Tokenizer {
 	}
 
 	/**
-	 * Save the model learned to disk. THis is done via Java's object serialization.
+	 * Save the model learned to disk. THis is done via Java's object
+	 * serialization.
 	 * 
 	 * @param filename
 	 *            where to write it (full path!)
 	 */
 	public void writeModel(String filename) {
 		if (trained == false || model == null) {
-			throw new IllegalStateException("train or load trained model first.");
+			throw new IllegalStateException(
+					"train or load trained model first.");
 		}
 		try {
-			FileOutputStream fos = new FileOutputStream(new File(filename + ".gz"));
+			FileOutputStream fos = new FileOutputStream(new File(filename
+					+ ".gz"));
 			GZIPOutputStream gout = new GZIPOutputStream(fos);
 			ObjectOutputStream oos = new ObjectOutputStream(gout);
 			oos.writeObject(this.model);
@@ -301,13 +322,14 @@ public class Tokenizer {
 	}
 
 	/**
-	 * load a previously trained FeatureSubsetModel (CRF4+Properties) which was stored as serialized
-	 * object to disk.
+	 * load a previously trained FeatureSubsetModel (CRF4+Properties) which was
+	 * stored as serialized object to disk.
 	 * 
 	 * @param filename
 	 *            where to find the serialized featureSubsetModel (full path!)
 	 */
-	public void readModel(String filename) throws IOException, FileNotFoundException, ClassNotFoundException {
+	public void readModel(String filename) throws IOException,
+			FileNotFoundException, ClassNotFoundException {
 		FileInputStream fis = new FileInputStream(new File(filename));
 		GZIPInputStream gin = new GZIPInputStream(fis);
 		ObjectInputStream ois = new ObjectInputStream(gin);

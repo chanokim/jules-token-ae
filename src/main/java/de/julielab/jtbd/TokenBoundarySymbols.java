@@ -19,23 +19,26 @@
 
 package de.julielab.jtbd;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 
 class TokenBoundarySymbols {
 
-	TreeSet<String> tbSymbols;
+	Set<String> tbSymbols;
 
 	public TokenBoundarySymbols() {
 		init();
 	}
 
 	private void init() {
-		tbSymbols = new TreeSet<String>();
+		tbSymbols = new HashSet<String>();
 		
 		
 		tbSymbols.add("-");
 		tbSymbols.add("+");
+//		tbSymbols.add("x");
 
 		tbSymbols.add("?");
 		tbSymbols.add("!");
@@ -43,6 +46,7 @@ class TokenBoundarySymbols {
 		tbSymbols.add(">");
 		tbSymbols.add("<");
 
+		tbSymbols.add(".");
 		tbSymbols.add(",");
 		tbSymbols.add(";");
 		tbSymbols.add(":");
@@ -64,7 +68,7 @@ class TokenBoundarySymbols {
 		tbSymbols.add("}");
 	}
 
-	public TreeSet<String> getSymbols() {
+	public Set<String> getSymbols() {
 		return tbSymbols;
 	}
 }
