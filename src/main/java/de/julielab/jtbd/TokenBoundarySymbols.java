@@ -21,7 +21,6 @@ package de.julielab.jtbd;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 
 class TokenBoundarySymbols {
@@ -38,7 +37,7 @@ class TokenBoundarySymbols {
 		
 		tbSymbols.add("-");
 		tbSymbols.add("+");
-//		tbSymbols.add("x");
+		tbSymbols.add("x");
 
 		tbSymbols.add("?");
 		tbSymbols.add("!");
