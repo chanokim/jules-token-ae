@@ -1,4 +1,4 @@
-jcore
-=====
+jules-token-ae
+==============
 
-The UIMA component repository developed at the JULIE Lab.
+The JULES Token Boundary detector.
