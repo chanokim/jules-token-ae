@@ -5,24 +5,43 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jules-token-ae</artifactId>
 	<packaging>jar</packaging>
-	<version>2.5.1</version>
+	<version>2.5.2-SNAPSHOT</version>
 	<description>UIMA Wrapper for JULIE Token Boundary Detector</description>
 
 	<parent>
 		<groupId>de.julielab</groupId>
 		<artifactId>jules-pears</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<build>
-<!-- 		<resources> -->
-<!-- 			<resource> -->
-<!-- 				<directory>src/main/resources</directory> -->
-<!-- 				<includes> -->
-<!-- 					<include>jules-token-ae.xml</include> -->
-<!-- 				</includes> -->
-<!-- 			</resource> -->
-<!-- 		</resources> -->
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>de.julielab.jtbd.TokenizerApplication</mainClass>
+						</manifest>
+					</archive>
+					<appendAssemblyId>true</appendAssemblyId>
+					<finalName>${artifactId}-executable</finalName>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -32,7 +51,6 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
-								<!-- copy-dependency plugin -->
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
@@ -59,7 +77,7 @@
 		<dependency>
 			<groupId>de.julielab</groupId>
 			<artifactId>jules-mallet-2</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.1</version>
 		</dependency>
 
 
@@ -72,7 +90,7 @@
 		<dependency>
 			<groupId>de.julielab</groupId>
 			<artifactId>jules-types</artifactId>
-			<version>2.10.7-SNAPSHOT</version>
+			<version>[2.10.7,)</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
