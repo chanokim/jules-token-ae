@@ -13,13 +13,13 @@ training material and is thus neither language nor domain dependent.
 Dependencies
 ============
 JTBD is based on a slightly modified version of the machine learning toolkit MALLET (Version 2.0.x). The
-necessary libraries are included in the lib/ directory.
+necessary libraries are included in the executable JAR (see below) and accessible via the JULIE Nexus artifact manager.
 
 
 Usage
 =====
 
-To run JTBD just run the self-executing jar "jtbd-<version>.jar". This will show the available modes.
+To run JTBD just run the self-executing jar "jtbd-&lt;version&gt;.jar". This will show the available modes.
 
 Documentation
 ==============
