@@ -19,7 +19,7 @@ necessary libraries are included in the lib/ directory.
 Usage
 =====
 
-To run JTBD just run the self-executing jar "jules-token-ae-<version>". This will show the available modes.
+To run JTBD just run the self-executing jar "jtbd-<version>.jar". This will show the available modes.
 
 Documentation
 ==============

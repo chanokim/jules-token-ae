@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jules-token-ae</artifactId>
 	<packaging>jar</packaging>
-	<version>2.5.2-SNAPSHOT</version>
+	<version>2.5.3</version>
 	<description>UIMA Wrapper for JULIE Token Boundary Detector</description>
 
 	<parent>
@@ -28,8 +28,8 @@
 							<mainClass>de.julielab.jtbd.TokenizerApplication</mainClass>
 						</manifest>
 					</archive>
-					<appendAssemblyId>true</appendAssemblyId>
-					<finalName>${artifactId}-executable</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+					<finalName>jtbd-${project.version}</finalName>
 				</configuration>
 				<executions>
 					<execution>
@@ -97,7 +97,7 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.0.2</version>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -105,14 +105,5 @@
 			<version>1.6.4</version>
 		</dependency>
 	</dependencies>
-
-
-	<!-- UNCOMMENT THIS PART IF YOU WANT TO CREATE A JAR PACKAGE FOR JSBD BEFORE 
-		RUNNING THE SCRIPT makeJSBDtgz.sh -->
-
-	<!-- <build> <plugins> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-		<artifactId>maven-jar-plugin</artifactId> <configuration> <finalName>JTBD-2.4</finalName> 
-		<excludes> <exclude>de/julielab/jules/**/*.class</exclude> </excludes> </configuration> 
-		</plugin> </plugins> </build> -->
 
 </project>
