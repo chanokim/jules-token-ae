@@ -26,7 +26,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -45,7 +47,9 @@ import cc.mallet.types.LabelAlphabet;
 import cc.mallet.types.LabelSequence;
 import cc.mallet.types.Sequence;
 
-public class Tokenizer {
+public class Tokenizer implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(Tokenizer.class);
@@ -158,8 +162,8 @@ public class Tokenizer {
 	/**
 	 * make material for prediction from a collection of sentences
 	 */
-	public InstanceList makePredictionData(ArrayList<String> orgSentences,
-			ArrayList<String> tokSentences) {
+	public InstanceList makePredictionData(List<String> orgSentences,
+			List<String> tokSentences) {
 
 		LOGGER.debug("makePredictionData() - making prediction data");
 
@@ -215,7 +219,7 @@ public class Tokenizer {
 	 *            sentence
 	 * @return an ArrayList of Unit objects containing the predicted label
 	 */
-	public ArrayList<Unit> predict(String sentence) {
+	public List<Unit> predict(String sentence) {
 		LOGGER.debug("predict() - before pedicting labelss ...");
 		if (trained == false || model == null) {
 			throw new IllegalStateException(
@@ -235,14 +239,14 @@ public class Tokenizer {
 	 *            instance for prediction
 	 * @return an ArrayList of Unit objects containing the predicted label
 	 */
-	public ArrayList<Unit> predict(Instance inst) {
+	public List<Unit> predict(Instance inst) {
 
 		if (trained == false || model == null) {
 			throw new IllegalStateException(
 					"No model available. Train or load trained model first.");
 		}
 
-		ArrayList<Unit> units = (ArrayList<Unit>) inst.getName();
+		List<Unit> units = (List<Unit>) inst.getName();
 		if (units.size() > 0) {
 			// get sequence
 			Sequence input = (Sequence) inst.getData();
@@ -277,8 +281,8 @@ public class Tokenizer {
 	 * @param orgLabels
 	 * @return
 	 */
-	public String showErrorContext(int i, ArrayList<Unit> units,
-			ArrayList<String> orgLabels) {
+	public String showErrorContext(int i, List<Unit> units,
+			List<String> orgLabels) {
 
 		final int c = 2;
 
@@ -342,9 +346,18 @@ public class Tokenizer {
 		return model;
 	}
 
-	void setModel(CRF crf) {
+	public void setModel(CRF crf) {
 		trained = true;
 		this.model = crf;
 	}
 
+	public boolean isTrained() {
+		return trained;
+	}
+
+	public void setTrained(boolean trained) {
+		this.trained = trained;
+	}
+
+	
 }

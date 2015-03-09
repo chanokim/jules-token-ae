@@ -32,6 +32,7 @@ import java.io.ObjectInputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
 
@@ -476,7 +477,7 @@ public class TokenizerApplication {
 					orgSentence.length() - 1, orgSentence.length());
 
 			Instance inst = (Instance) predData.get(i);
-			ArrayList<Unit> units = null;
+			List<Unit> units = null;
 			units = tokenizer.predict(inst);
 
 			// 3. evaluation
@@ -617,7 +618,7 @@ public class TokenizerApplication {
 					orgSentence.length() - 1, orgSentence.length());
 
 			Instance inst = (Instance) predData.get(i);
-			ArrayList<Unit> units = null;
+			List<Unit> units = null;
 			units = tokenizer.predict(inst);
 
 			// 3. evaluation
@@ -786,7 +787,7 @@ public class TokenizerApplication {
 						orgSentence.length() - 1, orgSentence.length());
 
 				Instance inst = (Instance) predData.get(i);
-				ArrayList<Unit> units = null;
+				List<Unit> units = null;
 				units = tokenizer.predict(inst);
 
 				// ArrayList<Unit> units = (ArrayList) inst.getName();

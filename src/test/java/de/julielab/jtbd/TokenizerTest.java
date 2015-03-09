@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public class TokenizerTest {
 
 		InstanceList iList = tokenizer.makePredictionData(orgSentences,tokSentences);
 		for(Instance instance: iList) {
-			ArrayList<Unit> unitList = tokenizer.predict(instance);
+			List<Unit> unitList = tokenizer.predict(instance);
 			assertNotNull(unitList);
 			for (Unit unit : unitList) {
 				LOGGER.trace("unit=" + unit);

@@ -23,6 +23,7 @@ package de.julielab.jules.ae;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
@@ -151,7 +152,7 @@ public class TokenAnnotator extends JCasAnnotator_ImplBase {
 				LOGGER.debug("writeTokensToCAS() - tokenizing input: " + text);
 				
 				//predict units
-				ArrayList<Unit> units = tokenizer.predict(text);	
+				List<Unit> units = tokenizer.predict(text);	
 				
 				LOGGER.debug("+++predition done!++++");
 				
